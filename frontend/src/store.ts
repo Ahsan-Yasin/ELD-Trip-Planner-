@@ -28,7 +28,7 @@ interface AuthState {
   isAuthenticated: boolean;
   setAuth: (token: string, user: User) => void;
   logout: () => void;
-  loadUserFromStorage: () => void;
+  loadUserFromStorage: () => Promise<void>;
 }
 
 interface TripState extends AuthState {
@@ -102,12 +102,21 @@ export const useTripStore = create<TripState>((set, get) => ({
     });
   },
   
-  loadUserFromStorage: () => {
+  loadUserFromStorage: async () => {
     const token = localStorage.getItem('auth_token');
     const userStr = localStorage.getItem('auth_user');
     if (token && userStr) {
       try {
-        set({ token, user: JSON.parse(userStr), isAuthenticated: true });
+        const parsedUser = JSON.parse(userStr);
+        set({ token, user: parsedUser, isAuthenticated: true });
+        
+        // Asynchronously verify token with the backend to catch stale sessions
+        const response = await fetch(`${API_BASE}/users/me/`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) {
+          get().logout();
+        }
       } catch (e) {
         get().logout();
       }

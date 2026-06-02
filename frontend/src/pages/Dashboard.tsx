@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   TrendingUp, 
   AlertTriangle, 
@@ -7,89 +7,63 @@ import {
   Navigation, 
   Clock, 
   ArrowRight,
-  ShieldCheck
+  ShieldCheck,
+  Map,
+  PlayCircle
 } from 'lucide-react';
+import { useTripStore } from '../store';
 
 const Dashboard: React.FC = () => {
-  // Mock dashboard data
+  const { tripHistory, loadTripHistory } = useTripStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    loadTripHistory(1);
+  }, [loadTripHistory]);
+
+  const totalTrips = tripHistory.length;
+  const totalMiles = tripHistory.reduce((sum, trip) => sum + trip.total_distance_miles, 0);
+  const totalViolations = tripHistory.reduce((sum, trip) => sum + trip.violation_reasons.length, 0);
+  const nonCompliantTrips = tripHistory.filter(trip => !trip.is_compliant).length;
+
+  const complianceAlerts = tripHistory
+    .filter(trip => !trip.is_compliant)
+    .map(trip => ({
+      driver: `Trip ID: ${trip.trip_id.substring(0, 8).toUpperCase()}`,
+      violation: trip.violation_reasons[0] || 'Hours of Service Violation',
+      time: trip.created_at ? new Date(trip.created_at).toLocaleDateString() : 'Recent',
+      desc: trip.violation_reasons.join(', ') || 'The planned route violates standard FMCSA Hours of Service regulations.',
+      severity: 'high' as const
+    }));
+
   const stats = [
     { 
-      label: 'Active Vehicles', 
-      value: '12 / 14', 
-      detail: '2 currently in maintenance', 
+      label: 'Total Trips', 
+      value: totalTrips.toString(), 
+      detail: 'Completed in history', 
       icon: Navigation, 
       color: 'text-primary bg-primary-container/10' 
     },
     { 
-      label: 'Miles Driven Today', 
-      value: '4,812 mi', 
-      detail: '+12% from weekly avg', 
+      label: 'Total Miles Driven', 
+      value: `${Math.round(totalMiles)} mi`, 
+      detail: 'Lifetime fleet mileage', 
       icon: TrendingUp, 
       color: 'text-emerald-600 bg-emerald-50' 
     },
     { 
-      label: 'ELD Compliance Rate', 
-      value: '91.6%', 
-      detail: '1 driver with active warning', 
+      label: 'Compliance Rate', 
+      value: totalTrips > 0 ? `${Math.round(((totalTrips - nonCompliantTrips) / totalTrips) * 100)}%` : '0%', 
+      detail: `${nonCompliantTrips} trips with violations`, 
       icon: ShieldCheck, 
       color: 'text-blue-600 bg-blue-50' 
     },
     { 
       label: 'Active Violations', 
-      value: '1', 
-      detail: '14-Hour Window exceedance', 
+      value: totalViolations.toString(), 
+      detail: 'Total logged incidents', 
       icon: AlertTriangle, 
       color: 'text-error bg-error-container/15' 
-    }
-  ];
-
-  const activeTrips = [
-    {
-      unit: 'Unit 402',
-      driver: 'John Doe',
-      route: 'Chicago → New York',
-      tripId: 'TRP-8924',
-      status: 'On Route',
-      speed: '65 mph',
-      progress: 65,
-      compliance: 'Compliant'
-    },
-    {
-      unit: 'Unit 315',
-      driver: 'Alex Mercer',
-      route: 'LAX → Seattle',
-      tripId: 'TRP-8821',
-      status: 'On Route',
-      speed: '58 mph',
-      progress: 88,
-      compliance: 'Compliant'
-    },
-    {
-      unit: 'Unit 204',
-      driver: 'Sarah Connor',
-      route: 'DFW → Chicago',
-      tripId: 'TRP-8790',
-      status: 'Rest Area',
-      speed: '0 mph',
-      progress: 42,
-      compliance: 'Warning (14h limit)'
-    }
-  ];
-
-  const complianceAlerts = [
-    {
-      driver: 'Sarah Connor (Unit 204)',
-      violation: '14-Hour Window Alert',
-      time: '12 mins ago',
-      desc: 'Driver approaching the 14-hour on-duty window limit. Action required: Dispatch rest break instruction.',
-      severity: 'high'
-    },
-    {
-      driver: 'Marcus Wright (Unit 102)',
-      violation: '30-Minute Break Due',
-      time: '1 hr ago',
-      desc: 'Driver has operated for 7.5 consecutive hours. Mandated rest break required within 30 minutes.',
-      severity: 'medium'
     }
   ];
 
@@ -134,72 +108,56 @@ const Dashboard: React.FC = () => {
 
       {/* Main Grid: Active Units & Compliance Alerts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg">
-        {/* Left 2 Columns: Active Units */}
+        {/* Left 2 Columns: Trip History */}
         <div className="lg:col-span-2 space-y-md">
-          <div className="bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden">
+          <div className="bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden flex flex-col min-h-[400px]">
             <div className="p-md border-b border-border-subtle flex justify-between items-center bg-surface-container-low/50">
-              <h2 className="font-headline-sm text-headline-sm text-text-primary">Active Fleet Status</h2>
+              <h2 className="font-headline-sm text-headline-sm text-text-primary">Recent Trip History</h2>
               <span className="px-sm py-[4px] bg-primary-fixed-dim text-on-primary-fixed rounded-full text-xs font-semibold">
-                3 Units On-Road
+                {totalTrips} Total
               </span>
             </div>
-            <div className="divide-y divide-border-subtle">
-              {activeTrips.map((trip, idx) => (
-                <div key={idx} className="p-md hover:bg-surface-container-low/30 transition-colors">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-md mb-md">
-                    <div className="flex items-center gap-md">
-                      <div className="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center border border-border-subtle text-primary font-bold">
-                        {trip.unit.split(' ')[1]}
-                      </div>
+            
+            {totalTrips === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-xl">
+                <Map size={48} className="text-primary/30 mb-md" />
+                <h3 className="font-title-lg text-title-lg text-on-surface mb-xs">No trips recorded yet</h3>
+                <p className="text-secondary font-body-md text-body-md max-w-[300px] mb-lg">
+                  Get started by planning your first route. The system will automatically check for HOS compliance.
+                </p>
+                <button 
+                  onClick={() => navigate('/planner')}
+                  className="bg-primary text-on-primary px-lg py-sm rounded-full font-label-lg font-bold flex items-center gap-sm hover:brightness-110 active:scale-95 transition-all"
+                >
+                  <PlayCircle size={20} />
+                  Plan Your First Route
+                </button>
+              </div>
+            ) : (
+              <div className="divide-y divide-border-subtle">
+                {tripHistory.slice(0, 3).map((trip) => (
+                  <div key={trip.trip_id} className="p-md hover:bg-surface-container-low/30 transition-colors">
+                    <div className="flex justify-between items-start mb-md">
                       <div>
-                        <div className="flex items-center gap-sm">
-                          <span className="font-headline-sm text-sm font-semibold text-text-primary">{trip.unit}</span>
-                          <span className="font-mono-label text-mono-label bg-surface-container-high px-xs py-0.5 rounded text-[11px]">
-                            {trip.tripId}
-                          </span>
+                        <div className="font-headline-sm text-sm font-semibold text-text-primary">
+                          {trip.pickup_location.split(',')[0]} → {trip.dropoff_location.split(',')[0]}
                         </div>
-                        <p className="font-body-md text-xs text-text-secondary mt-xs">{trip.driver} • {trip.route}</p>
+                        <p className="text-xs text-text-secondary">ID: {trip.trip_id}</p>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-md sm:text-right">
-                      <div className="hidden sm:block">
-                        <div className="font-headline-sm text-sm font-semibold text-text-primary">{trip.speed}</div>
-                        <p className="font-label-md text-[10px] text-text-secondary mt-xs">Current Speed</p>
-                      </div>
-                      <div>
+                      <div className="text-right">
+                        <div className="font-headline-sm text-sm font-semibold text-text-primary">{Math.round(trip.total_distance_miles)} mi</div>
                         <span className={`inline-flex items-center gap-sm px-sm py-[4px] rounded text-xs font-medium ${
-                          trip.compliance.includes('Warning') 
-                            ? 'bg-error-container text-on-error-container' 
-                            : 'bg-emerald-50 text-emerald-700'
+                          !trip.is_compliant ? 'bg-error-container text-on-error-container' : 'bg-emerald-50 text-emerald-700'
                         }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            trip.compliance.includes('Warning') ? 'bg-error' : 'bg-emerald-500'
-                          }`}></span>
-                          {trip.compliance}
+                          <span className={`w-1.5 h-1.5 rounded-full ${!trip.is_compliant ? 'bg-error' : 'bg-emerald-500'}`}></span>
+                          {trip.is_compliant ? 'Compliant' : 'Warning'}
                         </span>
                       </div>
                     </div>
                   </div>
-
-                  {/* Progress Bar */}
-                  <div className="space-y-xs">
-                    <div className="flex justify-between text-xs text-text-secondary">
-                      <span>Progress</span>
-                      <span>{trip.progress}%</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-surface-container rounded-full overflow-hidden">
-                      <div 
-                        className={`h-full rounded-full transition-all duration-500 ${
-                          trip.compliance.includes('Warning') ? 'bg-error' : 'bg-primary-container'
-                        }`} 
-                        style={{ width: `${trip.progress}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
             <div className="p-md border-t border-border-subtle bg-surface-container-lowest text-center">
               <Link to="/history" className="text-primary hover:underline font-label-md text-label-md inline-flex items-center gap-xs">
                 View All Trips and Logs
@@ -217,22 +175,28 @@ const Dashboard: React.FC = () => {
               Compliance Alerts
             </h3>
             <div className="space-y-md">
-              {complianceAlerts.map((alert, idx) => (
-                <div key={idx} className={`p-md border rounded-xl ${
-                  alert.severity === 'high' 
-                    ? 'border-error-container bg-error-container/10 text-on-error-container' 
-                    : 'border-amber-200 bg-amber-50/50 text-amber-900'
-                }`}>
-                  <div className="flex justify-between items-start">
-                    <div className="font-label-md text-xs font-semibold">{alert.driver}</div>
-                    <span className="text-[10px] text-text-secondary">{alert.time}</span>
-                  </div>
-                  <div className="font-headline-sm text-sm font-bold mt-xs">{alert.violation}</div>
-                  <p className="font-body-md text-xs text-text-secondary mt-sm line-clamp-3 leading-relaxed">
-                    {alert.desc}
-                  </p>
+              {complianceAlerts.length === 0 ? (
+                <div className="text-center p-md border border-dashed border-border-subtle rounded-xl text-text-secondary font-body-md text-xs">
+                  No active compliance alerts.
                 </div>
-              ))}
+              ) : (
+                complianceAlerts.map((alert, idx) => (
+                  <div key={idx} className={`p-md border rounded-xl ${
+                    alert.severity === 'high' 
+                      ? 'border-error-container bg-error-container/10 text-on-error-container' 
+                      : 'border-amber-200 bg-amber-50/50 text-amber-900'
+                  }`}>
+                    <div className="flex justify-between items-start">
+                      <div className="font-label-md text-xs font-semibold">{alert.driver}</div>
+                      <span className="text-[10px] text-text-secondary">{alert.time}</span>
+                    </div>
+                    <div className="font-headline-sm text-sm font-bold mt-xs">{alert.violation}</div>
+                    <p className="font-body-md text-xs text-text-secondary mt-sm line-clamp-3 leading-relaxed">
+                      {alert.desc}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
             <div className="mt-md pt-md border-t border-border-subtle text-center">
               <Link to="/compliance" className="text-primary hover:underline font-label-md text-label-md inline-flex items-center gap-xs">

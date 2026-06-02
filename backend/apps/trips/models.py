@@ -3,6 +3,7 @@ from datetime import datetime
 from uuid import uuid4
 
 class Trip(Document):
+    user_id             = StringField(required=True)
     # Inputs
     current_location    = StringField()       # "Chicago, IL"
     pickup_location     = StringField()
@@ -33,4 +34,4 @@ class Trip(Document):
     created_at            = DateTimeField(default=datetime.utcnow)
     trip_id               = StringField(default=lambda: str(uuid4()))
 
-    meta = {'collection': 'trips', 'indexes': ['trip_id', 'created_at']}
+    meta = {'collection': 'trips', 'indexes': ['trip_id', 'user_id', 'created_at']}
