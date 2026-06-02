@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LogisticsPro - Route Map</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Courier+Prime&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#191b22",
+                      "on-error": "#ffffff",
+                      "secondary-fixed": "#dce2f3",
+                      "on-tertiary-fixed-variant": "#7d2d00",
+                      "surface": "#faf8ff",
+                      "primary-fixed": "#dbe1ff",
+                      "inverse-surface": "#2e3037",
+                      "primary-container": "#2563eb",
+                      "on-tertiary-container": "#ffede6",
+                      "surface-container": "#ededf6",
+                      "tertiary-fixed-dim": "#ffb596",
+                      "on-tertiary-fixed": "#360f00",
+                      "tertiary-container": "#bc4800",
+                      "on-primary-fixed": "#00174b",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#faf8ff",
+                      "on-secondary": "#ffffff",
+                      "border-subtle": "#E5E7EB",
+                      "surface-tint": "#0053db",
+                      "outline-variant": "#c3c6d7",
+                      "outline": "#737686",
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#e2e2eb",
+                      "on-primary": "#ffffff",
+                      "secondary": "#585f6c",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "text-primary": "#0F1117",
+                      "inverse-primary": "#b4c5ff",
+                      "text-secondary": "#6B7280",
+                      "surface-container-highest": "#e2e2eb",
+                      "error": "#ba1a1a",
+                      "on-surface-variant": "#434655",
+                      "tertiary": "#943700",
+                      "secondary-fixed-dim": "#c0c7d6",
+                      "on-primary-container": "#eeefff",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed": "#ffdbcd",
+                      "on-background": "#191b22",
+                      "secondary-container": "#dce2f3",
+                      "on-secondary-fixed": "#151c27",
+                      "surface-container-high": "#e7e7f0",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#d9d9e2",
+                      "inverse-on-surface": "#f0f0f9",
+                      "primary": "#004ac6",
+                      "on-secondary-container": "#5e6572",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "surface-container-low": "#f3f3fc",
+                      "surface-background": "#FFFFFF",
+                      "on-secondary-fixed-variant": "#404754",
+                      "background": "#faf8ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "margin-mobile": "16px",
+                      "xl": "32px",
+                      "xxl": "48px",
+                      "xs": "4px",
+                      "base": "8px",
+                      "sm": "8px",
+                      "margin-desktop": "32px",
+                      "gutter": "16px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "headline-sm": ["Inter"],
+                      "mono-label": ["Courier Prime"],
+                      "headline-md": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-md": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-sm": ["18px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "mono-label": ["13px", {"lineHeight": "1", "letterSpacing": "0em", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom scrollbar for panel */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #E5E7EB;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-text-primary h-full font-body-md antialiased overflow-hidden flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="bg-surface-container-low border-r border-border-subtle flex flex-col w-[260px] h-screen fixed left-0 top-0 py-lg px-md z-40 hidden md:flex">
+<!-- Header -->
+<div class="mb-xl flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-bold">
+                CL
+            </div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-surface">Dispatch Center</h1>
+<p class="font-label-md text-label-md text-text-secondary mt-1">Active: 12 Units</p>
+</div>
+</div>
+<!-- CTA -->
+<button class="bg-[#2563EB] text-white h-[44px] rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 mb-lg w-full transition-colors hover:bg-primary">
+<span class="material-symbols-outlined text-[20px]">add</span>
+            New Trip Request
+        </button>
+<!-- Navigation Tabs -->
+<div class="flex-1 flex flex-col gap-sm">
+<a class="text-secondary hover:bg-surface-container-high hover:bg-surface-container-highest transition-all scale-95 active:scale-90 duration-150 flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">route</span>
+                Trip Planner
+            </a>
+<a class="bg-primary-container text-on-primary-container rounded-xl font-semibold scale-95 active:scale-90 duration-150 flex items-center gap-3 px-3 py-2 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px] icon-fill">map</span>
+                Route Map
+            </a>
+<a class="text-secondary hover:bg-surface-container-high hover:bg-surface-container-highest transition-all scale-95 active:scale-90 duration-150 flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">gavel</span>
+                Compliance
+            </a>
+<a class="text-secondary hover:bg-surface-container-high hover:bg-surface-container-highest transition-all scale-95 active:scale-90 duration-150 flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span>
+                ELD Logs
+            </a>
+<a class="text-secondary hover:bg-surface-container-high hover:bg-surface-container-highest transition-all scale-95 active:scale-90 duration-150 flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">history</span>
+                History
+            </a>
+</div>
+<!-- Footer Tabs -->
+<div class="mt-auto border-t border-border-subtle pt-4 flex flex-col gap-sm">
+<a class="text-secondary hover:bg-surface-container-high transition-all flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+                Support
+            </a>
+<a class="text-secondary hover:bg-surface-container-high transition-all flex items-center gap-3 px-3 py-2 rounded-lg font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+                Sign Out
+            </a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex ml-0 md:ml-[260px] h-screen relative">
+<!-- Left Panel: Turn-by-Turn Instructions -->
+<aside class="w-[380px] bg-surface-container-lowest border-r border-border-subtle h-full flex flex-col absolute md:relative z-20 shadow-md md:shadow-none transition-transform -translate-x-full md:translate-x-0" id="routePanel">
+<!-- Panel Header -->
+<div class="p-lg border-b border-border-subtle bg-surface-bright sticky top-0 z-10">
+<div class="flex justify-between items-start mb-4">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-1 bg-surface-container-high text-text-primary rounded text-[10px] font-bold uppercase tracking-wider">Active Trip</span>
+<span class="font-mono-label text-mono-label text-text-secondary">TRP-8924</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Chicago → New York</h2>
+</div>
+<button class="md:hidden text-text-secondary" onclick="document.getElementById('routePanel').classList.toggle('-translate-x-full')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Quick Stats -->
+<div class="grid grid-cols-2 gap-md">
+<div class="bg-surface p-3 rounded-lg border border-border-subtle">
+<div class="font-label-md text-label-md text-text-secondary mb-1">Est. Arrival</div>
+<div class="font-headline-sm text-headline-sm text-[#2563EB]">14:30 EST</div>
+</div>
+<div class="bg-surface p-3 rounded-lg border border-border-subtle">
+<div class="font-label-md text-label-md text-text-secondary mb-1">Distance Left</div>
+<div class="font-headline-sm text-headline-sm text-on-surface">412 mi</div>
+</div>
+</div>
+</div>
+<!-- Route List -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-md relative">
+<!-- Vertical Line connecting nodes -->
+<div class="absolute left-[39px] top-[40px] bottom-[40px] w-px bg-border-subtle"></div>
+<!-- Node: Start -->
+<div class="flex gap-md mb-lg relative z-10">
+<div class="w-12 text-right pt-1">
+<div class="font-mono-label text-mono-label text-text-secondary">08:00</div>
+</div>
+<div class="relative flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-surface border-2 border-[#2563EB] flex items-center justify-center z-10">
+<div class="w-2 h-2 rounded-full bg-[#2563EB]"></div>
+</div>
+</div>
+<div class="flex-1 pb-lg">
+<h4 class="font-label-md text-label-md font-bold text-on-surface mb-1">Start Trip</h4>
+<p class="font-body-md text-body-md text-text-secondary text-sm">Chicago Logistics Hub, IL</p>
+</div>
+</div>
+<!-- Segment -->
+<div class="flex gap-md mb-lg relative z-10">
+<div class="w-12 text-right pt-1"></div>
+<div class="w-6 flex justify-center"></div>
+<div class="flex-1 bg-surface border border-border-subtle rounded-lg p-3">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-label-md font-semibold text-[#2563EB]">I-94 E</span>
+<span class="font-mono-label text-mono-label text-text-secondary">280 mi</span>
+</div>
+<p class="text-sm text-text-secondary">Continue on I-94 East towards Detroit.</p>
+</div>
+</div>
+<!-- Node: Pickup -->
+<div class="flex gap-md mb-lg relative z-10">
+<div class="w-12 text-right pt-1">
+<div class="font-mono-label text-mono-label text-text-secondary">12:15</div>
+</div>
+<div class="relative flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-[#2563EB] flex items-center justify-center z-10 shadow-[0_0_0_4px_#faf8ff]">
+<span class="material-symbols-outlined text-[14px] text-white">box</span>
+</div>
+</div>
+<div class="flex-1 pb-lg">
+<div class="flex items-center gap-2 mb-1">
+<h4 class="font-label-md text-label-md font-bold text-on-surface">Pickup Load</h4>
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded text-[10px] font-bold">REQ</span>
+</div>
+<p class="font-body-md text-body-md text-text-secondary text-sm mb-2">Detroit Auto Parts, MI</p>
+<div class="bg-surface-container-high rounded p-2 text-xs text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                            Gate 4, speak to Receiving.
+                        </div>
+</div>
+</div>
+<!-- Node: Fuel Stop 1 -->
+<div class="flex gap-md mb-lg relative z-10">
+<div class="w-12 text-right pt-1">
+<div class="font-mono-label text-mono-label text-text-secondary">14:30</div>
+</div>
+<div class="relative flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-surface border-2 border-outline flex items-center justify-center z-10 bg-white">
+<span class="material-symbols-outlined text-[14px] text-outline">local_gas_station</span>
+</div>
+</div>
+<div class="flex-1 pb-lg">
+<h4 class="font-label-md text-label-md font-bold text-on-surface mb-1">Fuel Stop</h4>
+<p class="font-body-md text-body-md text-text-secondary text-sm">Flying J Travel Center, Toledo, OH</p>
+</div>
+</div>
+<!-- Segment -->
+<div class="flex gap-md mb-lg relative z-10">
+<div class="w-12 text-right pt-1"></div>
+<div class="w-6 flex justify-center"></div>
+<div class="flex-1 bg-surface border border-border-subtle rounded-lg p-3">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-label-md font-semibold text-[#2563EB]">I-80 E</span>
+<span class="font-mono-label text-mono-label text-text-secondary">410 mi</span>
+</div>
+<p class="text-sm text-text-secondary">Merge onto I-80 East via Ohio Turnpike.</p>
+</div>
+</div>
+<!-- Node: Fuel Stop 2 -->
+<div class="flex gap-md mb-lg relative z-10">
+<div class="w-12 text-right pt-1">
+<div class="font-mono-label text-mono-label text-text-secondary">20:45</div>
+</div>
+<div class="relative flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-surface border-2 border-outline flex items-center justify-center z-10 bg-white">
+<span class="material-symbols-outlined text-[14px] text-outline">local_gas_station</span>
+</div>
+</div>
+<div class="flex-1 pb-lg">
+<h4 class="font-label-md text-label-md font-bold text-on-surface mb-1">Rest &amp; Fuel</h4>
+<p class="font-body-md text-body-md text-text-secondary text-sm">Pilot Travel Center, Bloomsburg, PA</p>
+</div>
+</div>
+<!-- Node: Dropoff -->
+<div class="flex gap-md relative z-10">
+<div class="w-12 text-right pt-1">
+<div class="font-mono-label text-mono-label text-text-secondary opacity-50">Est</div>
+</div>
+<div class="relative flex flex-col items-center">
+<div class="w-6 h-6 rounded-full bg-surface border-2 border-text-primary flex items-center justify-center z-10 bg-white">
+<div class="w-2 h-2 bg-text-primary"></div>
+</div>
+</div>
+<div class="flex-1">
+<h4 class="font-label-md text-label-md font-bold text-on-surface mb-1">Dropoff</h4>
+<p class="font-body-md text-body-md text-text-secondary text-sm">Queens Distribution Center, NY</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Right Canvas: Map Area -->
+<div class="flex-1 relative bg-[#e5e3df]">
+<!-- Map Background Image Placeholder -->
+<img alt="Map view" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-multiply" data-alt="A top-down, minimalist digital map view focusing on the Northeast United States. The map style is clean, vector-based, and highly professional, utilizing warm neutral tones like soft grays and beige to represent landmasses, with subtle off-white lines for secondary roads. The aesthetic is reminiscent of high-end logistics software, prioritizing clarity over topographical detail. The lighting is bright and even, creating a crisp, high-tech light-mode environment. No complex terrain textures, just clean geometric representation." data-location="USA Northeast" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQ4y-9gesZc2sAP2aRojHjNCiRVVMJYGaYOlJJpb8x8f0W0aiemutVk_6_HKGJ8-9YwRwln3yV-a9xt-BZiH79R14GKGU_nnpix_cCqoFd3KMX5dZ-lbKSd0cHITJtUnkf_83i11LWlbHxLEPWSrth0-SEIkjYUWI43xJaQ5ZraQUlJaNUPZ4-6Oudb77khTzfyp-rLZxyv3QusJF3ePS3xvQk0oa0qwQm1fz4oIAfgohywcHQFiFaJRS_qhlMjv7K3Pew_DPNhn0"/>
+<!-- SVG Overlay for Route Polyline & Markers (Simulated with CSS/HTML elements for UI representation) -->
+<div class="absolute inset-0 pointer-events-none overflow-hidden">
+<!-- Simulated Route Line (Chicago to NY rough curve) -->
+<svg class="absolute inset-0 z-0" height="100%" preserveaspectratio="none" viewbox="0 0 1000 800" width="100%">
+<!-- Shadow -->
+<path d="M 200,400 Q 400,300 600,450 T 850,350" fill="none" stroke="rgba(0,0,0,0.1)" stroke-linecap="round" stroke-width="8"></path>
+<!-- Main Line -->
+<path class="opacity-80" d="M 200,400 Q 400,300 600,450 T 850,350" fill="none" stroke="#2563EB" stroke-dasharray="8 4" stroke-width="4"></path>
+<path d="M 200,400 Q 400,300 450,320" fill="none" stroke="#2563EB" stroke-linecap="round" stroke-width="4"></path>
+</svg>
+<!-- Map Markers -->
+<!-- Chicago Start -->
+<div class="absolute left-[20%] top-[50%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="bg-surface px-2 py-1 rounded shadow-sm text-[10px] font-bold mb-1 border border-border-subtle">CHICAGO</div>
+<div class="w-4 h-4 rounded-full bg-white border-2 border-[#2563EB] shadow-md z-10"></div>
+</div>
+<!-- Detroit Pickup -->
+<div class="absolute left-[45%] top-[40%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="bg-surface px-2 py-1 rounded shadow-sm text-[10px] font-bold mb-1 border border-border-subtle">DETROIT</div>
+<div class="w-5 h-5 rounded-full bg-[#2563EB] flex items-center justify-center shadow-md z-10 border-2 border-white">
+<div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+</div>
+</div>
+<!-- NY Dropoff -->
+<div class="absolute left-[85%] top-[43.75%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="bg-text-primary text-white px-2 py-1 rounded shadow-sm text-[10px] font-bold mb-1">NEW YORK</div>
+<div class="w-4 h-4 rounded-sm bg-white border-2 border-text-primary shadow-md z-10"></div>
+</div>
+</div>
+<!-- Floating UI Elements -->
+<!-- Mobile Menu Toggle -->
+<button class="md:hidden absolute top-md left-md z-30 bg-surface w-10 h-10 rounded-lg shadow-sm border border-border-subtle flex items-center justify-center text-text-primary" onclick="document.getElementById('routePanel').classList.toggle('-translate-x-full')">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Floating Info Pill (Top Right) -->
+<div class="absolute top-md right-md z-10 bg-surface/90 backdrop-blur-sm border border-border-subtle px-4 py-2 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.05)] flex items-center gap-3">
+<span class="font-mono-label text-mono-label text-on-surface font-semibold">812 mi</span>
+<div class="w-1 h-1 rounded-full bg-outline-variant"></div>
+<span class="font-mono-label text-mono-label text-on-surface font-semibold">14.8 hrs</span>
+<div class="w-1 h-1 rounded-full bg-outline-variant"></div>
+<div class="flex items-center gap-1 text-text-secondary">
+<span class="material-symbols-outlined text-[16px]">local_gas_station</span>
+<span class="font-label-md text-label-md">2 stops</span>
+</div>
+</div>
+<!-- Map Controls (Bottom Right) -->
+<div class="absolute bottom-xl right-md z-10 flex flex-col gap-2">
+<button class="w-10 h-10 bg-surface border border-border-subtle rounded-lg shadow-sm flex items-center justify-center text-text-primary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[20px]">my_location</span>
+</button>
+<div class="flex flex-col bg-surface border border-border-subtle rounded-lg shadow-sm overflow-hidden">
+<button class="w-10 h-10 flex items-center justify-center text-text-primary hover:bg-surface-container-low transition-colors border-b border-border-subtle">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-text-primary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[20px]">remove</span>
+</button>
+</div>
+</div>
+<!-- Active Status Chip (Bottom Center) -->
+<div class="absolute bottom-xl left-1/2 -translate-x-1/2 z-10 bg-surface border border-border-subtle px-4 py-3 rounded-xl shadow-sm flex items-center gap-4">
+<div class="flex items-center gap-2">
+<div class="relative flex items-center justify-center">
+<div class="w-3 h-3 rounded-full bg-emerald-500 absolute animate-ping opacity-75"></div>
+<div class="w-3 h-3 rounded-full bg-emerald-500 relative"></div>
+</div>
+<span class="font-label-md text-label-md font-semibold text-on-surface">Unit 402 - On Route</span>
+</div>
+<div class="h-6 w-px bg-border-subtle"></div>
+<span class="font-mono-label text-mono-label text-text-secondary">65 mph</span>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Trip History - LogisticsPro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Courier+Prime&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#191b22",
+                      "on-error": "#ffffff",
+                      "secondary-fixed": "#dce2f3",
+                      "on-tertiary-fixed-variant": "#7d2d00",
+                      "surface": "#faf8ff",
+                      "primary-fixed": "#dbe1ff",
+                      "inverse-surface": "#2e3037",
+                      "primary-container": "#2563eb",
+                      "on-tertiary-container": "#ffede6",
+                      "surface-container": "#ededf6",
+                      "tertiary-fixed-dim": "#ffb596",
+                      "on-tertiary-fixed": "#360f00",
+                      "tertiary-container": "#bc4800",
+                      "on-primary-fixed": "#00174b",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-bright": "#faf8ff",
+                      "on-secondary": "#ffffff",
+                      "border-subtle": "#E5E7EB",
+                      "surface-tint": "#0053db",
+                      "outline-variant": "#c3c6d7",
+                      "outline": "#737686",
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#e2e2eb",
+                      "on-primary": "#ffffff",
+                      "secondary": "#585f6c",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "text-primary": "#0F1117",
+                      "inverse-primary": "#b4c5ff",
+                      "text-secondary": "#6B7280",
+                      "surface-container-highest": "#e2e2eb",
+                      "error": "#ba1a1a",
+                      "on-surface-variant": "#434655",
+                      "tertiary": "#943700",
+                      "secondary-fixed-dim": "#c0c7d6",
+                      "on-primary-container": "#eeefff",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed": "#ffdbcd",
+                      "on-background": "#191b22",
+                      "secondary-container": "#dce2f3",
+                      "on-secondary-fixed": "#151c27",
+                      "surface-container-high": "#e7e7f0",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#d9d9e2",
+                      "inverse-on-surface": "#f0f0f9",
+                      "primary": "#004ac6",
+                      "on-secondary-container": "#5e6572",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "surface-container-low": "#f3f3fc",
+                      "surface-background": "#FFFFFF",
+                      "on-secondary-fixed-variant": "#404754",
+                      "background": "#faf8ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "margin-mobile": "16px",
+                      "xl": "32px",
+                      "xxl": "48px",
+                      "xs": "4px",
+                      "base": "8px",
+                      "sm": "8px",
+                      "margin-desktop": "32px",
+                      "gutter": "16px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "mono-label": [
+                              "courierPrime"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-sm": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "mono-label": [
+                              "13px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.015em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0em",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Smooth expand/collapse for table rows */
+        .expandable-row {
+            transition: all 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+        .expandable-row.expanded {
+            max-height: 500px; /* Arbitrary large max-height */
+            opacity: 1;
+        }
+        
+        /* Minimalist Input Focus Transition */
+        .minimal-input:focus {
+            border-bottom-color: #2563EB; /* primary-container color for focus */
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="flex flex-col w-[260px] h-screen fixed left-0 top-0 py-lg px-md z-40 bg-surface-container-low border-r border-border-subtle hidden md:flex">
+<!-- Header -->
+<div class="flex items-center gap-md mb-xl px-sm">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden flex-shrink-0">
+<img alt="Carrier Logo" class="w-full h-full object-cover" data-alt="A stylized, minimalist logo of a freight truck driving forward, composed of simple geometric shapes in deep blue and white, set against a pristine, well-lit background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnZFfHuXOwHjyCJZtBKncRTxj2blpJMjn7vhygpoWUu_08gfm1Gx4ymSxiNyMC2t5nDGimpWu1HSDyB4yj77xb02C8hIQQ8qVKJ5F4JJkTVapeQ6k3ApVhmIGyp4U_YtCmFunGoFxApAHRwyyI_WA1jjK08QaN9-52s5oaoopxwJpqs25IPquf8JwHpKSkWBxpUi1WWnqsv6hhySOdzfAdFk9I1GLpYYd4e_cR6ERQPhG9Ik0waXbl8psrbHFEWKIX8cluEP2Vkws"/>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">Dispatch Center</span>
+<span class="font-label-md text-label-md text-text-secondary">Active: 12 Units</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 flex flex-col gap-sm">
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-secondary hover:bg-surface-container-high hover:bg-surface-container-highest transition-all scale-95 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 300;">route</span>
+<span class="font-label-md text-label-md">Trip Planner</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-secondary hover:bg-surface-container-high hover:bg-surface-container-highest transition-all scale-95 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 300;">map</span>
+<span class="font-label-md text-label-md">Route Map</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-secondary hover:bg-surface-container-high hover:bg-surface-container-highest transition-all scale-95 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 300;">gavel</span>
+<span class="font-label-md text-label-md">Compliance</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-secondary hover:bg-surface-container-high hover:bg-surface-container-highest transition-all scale-95 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 300;">description</span>
+<span class="font-label-md text-label-md">ELD Logs</span>
+</a>
+<!-- ACTIVE TAB -->
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container rounded-xl font-semibold hover:bg-surface-container-highest transition-all scale-95 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1, 'wght' 400;">history</span>
+<span class="font-label-md text-label-md">History</span>
+</a>
+</div>
+<!-- Footer Actions -->
+<div class="mt-auto flex flex-col gap-sm pt-md border-t border-border-subtle">
+<button class="w-full h-[44px] bg-primary text-on-primary rounded-lg font-label-md text-label-md font-semibold flex items-center justify-center gap-sm hover:bg-primary-fixed-variant transition-colors mb-md">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                New Trip Request
+            </button>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-secondary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 300;">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-xl text-secondary hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'wght' 300;">logout</span>
+<span class="font-label-md text-label-md">Sign Out</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-[260px] p-margin-mobile md:p-margin-desktop bg-surface w-full min-h-screen">
+<!-- Page Header & In-Page Navigation -->
+<header class="mb-xl">
+<h1 class="font-headline-lg text-headline-lg text-text-primary mb-md">Trip Management</h1>
+<!-- In-Page Tabs -->
+<div class="flex gap-lg border-b border-border-subtle">
+<button class="pb-sm font-label-md text-label-md text-text-secondary hover:text-text-primary transition-colors">
+                    Active Trips
+                </button>
+<button class="pb-sm font-label-md text-label-md text-primary border-b-2 border-primary transition-colors font-semibold">
+                    History
+                </button>
+</div>
+</header>
+<!-- Filters & Search Toolbar -->
+<div class="flex flex-wrap items-end justify-between gap-md mb-xl">
+<div class="flex gap-md flex-1 min-w-[300px]">
+<div class="relative flex-1 max-w-sm">
+<label class="block font-label-md text-label-md text-text-secondary mb-xs">Search Routes or IDs</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-0 bottom-sm text-text-secondary text-[20px]">search</span>
+<input class="w-full bg-transparent border-0 border-b border-border-subtle pl-lg pb-sm text-text-primary font-body-md minimal-input transition-colors focus:ring-0" placeholder="e.g. LAX to SEA" type="text"/>
+</div>
+</div>
+<div class="relative w-48">
+<label class="block font-label-md text-label-md text-text-secondary mb-xs">Date Range</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-0 bottom-sm text-text-secondary text-[20px]">calendar_today</span>
+<input class="w-full bg-transparent border-0 border-b border-border-subtle pl-lg pb-sm text-text-primary font-body-md minimal-input cursor-pointer focus:ring-0" readonly="" type="text" value="Oct 2023"/>
+</div>
+</div>
+</div>
+<button class="h-[44px] px-lg border border-primary text-primary rounded-lg font-label-md text-label-md font-semibold hover:bg-surface-container-low transition-colors flex items-center gap-xs">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                Export Report
+            </button>
+</div>
+<!-- Data Table (Bento/Card Container Style) -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b-2 border-border-subtle">
+<th class="px-md py-sm font-label-md text-label-md text-text-secondary font-medium w-1/4">Date Completed</th>
+<th class="px-md py-sm font-label-md text-label-md text-text-secondary font-medium w-2/4">Route Summary</th>
+<th class="px-md py-sm font-label-md text-label-md text-text-secondary font-medium w-1/6">Total Distance</th>
+<th class="px-md py-sm font-label-md text-label-md text-text-secondary font-medium w-1/6">Log Status</th>
+</tr>
+</thead>
+<tbody id="trip-table-body">
+<!-- Row 1 (Compliant) -->
+<tr class="border-b border-border-subtle cursor-pointer hover:bg-surface-container-low transition-colors group" onclick="toggleDetails('trip-1')">
+<td class="px-md py-sm font-body-md text-text-primary">Oct 24, 2023</td>
+<td class="px-md py-sm font-body-md text-text-primary flex items-center gap-xs">
+<span class="font-mono-label text-mono-label bg-surface-container-high px-xs py-1 rounded">TRP-8821</span>
+                            LAX
+                            <span class="material-symbols-outlined text-[16px] text-text-secondary">arrow_right_alt</span>
+                            SEA
+                        </td>
+<td class="px-md py-sm font-body-md text-text-secondary">1,135 mi</td>
+<td class="px-md py-sm">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-primary-fixed-dim text-on-primary-fixed font-label-md text-label-md h-[24px]">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                Compliant
+                            </span>
+</td>
+</tr>
+<!-- Row 1 Details -->
+<tr class="border-b border-border-subtle bg-surface-bright hidden" id="trip-1">
+<td class="p-0" colspan="4">
+<div class="expandable-row p-xl bg-surface-bright border-l-4 border-primary">
+<h4 class="font-headline-sm text-headline-sm text-text-primary mb-md">HOS Logs Summary</h4>
+<div class="grid grid-cols-3 gap-md">
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-md">
+<div class="font-label-md text-label-md text-text-secondary mb-xs">Driving Time</div>
+<div class="font-headline-md text-headline-md text-text-primary">18h 45m</div>
+<div class="font-body-md text-text-secondary text-sm mt-xs">Over 2 days</div>
+</div>
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-md">
+<div class="font-label-md text-label-md text-text-secondary mb-xs">Rest Breaks</div>
+<div class="font-headline-md text-headline-md text-text-primary">3</div>
+<div class="font-body-md text-text-secondary text-sm mt-xs">Total: 34h 00m</div>
+</div>
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-md">
+<div class="font-label-md text-label-md text-text-secondary mb-xs">Exceptions</div>
+<div class="font-headline-md text-headline-md text-text-primary">0</div>
+<div class="font-body-md text-text-secondary text-sm mt-xs">Clean record</div>
+</div>
+</div>
+<div class="mt-md flex justify-end">
+<button class="text-primary font-label-md text-label-md hover:underline flex items-center gap-xs">
+                                        View Full ELD Log <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</button>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 2 (Violation) -->
+<tr class="border-b border-border-subtle cursor-pointer hover:bg-surface-container-low transition-colors group" onclick="toggleDetails('trip-2')">
+<td class="px-md py-sm font-body-md text-text-primary">Oct 21, 2023</td>
+<td class="px-md py-sm font-body-md text-text-primary flex items-center gap-xs">
+<span class="font-mono-label text-mono-label bg-surface-container-high px-xs py-1 rounded">TRP-8790</span>
+                            DFW
+                            <span class="material-symbols-outlined text-[16px] text-text-secondary">arrow_right_alt</span>
+                            ORD
+                        </td>
+<td class="px-md py-sm font-body-md text-text-secondary">925 mi</td>
+<td class="px-md py-sm">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-error-container text-on-error-container font-label-md text-label-md h-[24px]">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+                                Violation
+                            </span>
+</td>
+</tr>
+<!-- Row 2 Details -->
+<tr class="border-b border-border-subtle bg-surface-bright hidden" id="trip-2">
+<td class="p-0" colspan="4">
+<div class="expandable-row p-xl bg-surface-bright border-l-4 border-error">
+<div class="flex items-start justify-between mb-md">
+<h4 class="font-headline-sm text-headline-sm text-text-primary">HOS Violation Details</h4>
+<span class="bg-error-container text-on-error-container font-mono-label px-2 py-1 rounded text-xs">Code: HOS-14H</span>
+</div>
+<div class="bg-surface-container-lowest border border-border-subtle rounded-lg p-md mb-md">
+<p class="font-body-md text-text-primary"><strong class="font-semibold">Description:</strong> Driver exceeded the 14-hour duty limit by 45 minutes on Oct 22, 2023.</p>
+<p class="font-body-md text-text-secondary mt-xs">Action Required: Acknowledge violation and review scheduling protocols.</p>
+</div>
+<div class="flex gap-sm">
+<button class="h-[44px] px-lg bg-primary text-on-primary rounded-lg font-label-md text-label-md font-semibold hover:bg-primary-fixed-variant transition-colors">
+                                        Acknowledge
+                                    </button>
+<button class="h-[44px] px-lg border border-border-subtle text-text-primary rounded-lg font-label-md text-label-md font-semibold hover:bg-surface-container-low transition-colors">
+                                        View Full ELD Log
+                                     </button>
+</div>
+</div>
+</td>
+</tr>
+<!-- Row 3 (Compliant) -->
+<tr class="border-b border-border-subtle cursor-pointer hover:bg-surface-container-low transition-colors group" onclick="toggleDetails('trip-3')">
+<td class="px-md py-sm font-body-md text-text-primary">Oct 18, 2023</td>
+<td class="px-md py-sm font-body-md text-text-primary flex items-center gap-xs">
+<span class="font-mono-label text-mono-label bg-surface-container-high px-xs py-1 rounded">TRP-8742</span>
+                            MIA
+                            <span class="material-symbols-outlined text-[16px] text-text-secondary">arrow_right_alt</span>
+                            ATL
+                        </td>
+<td class="px-md py-sm font-body-md text-text-secondary">660 mi</td>
+<td class="px-md py-sm">
+<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-primary-fixed-dim text-on-primary-fixed font-label-md text-label-md h-[24px]">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+                                Compliant
+                            </span>
+</td>
+</tr>
+<!-- Row 3 Details -->
+<tr class="border-b border-border-subtle bg-surface-bright hidden" id="trip-3">
+<td class="p-0" colspan="4">
+<div class="expandable-row p-xl bg-surface-bright border-l-4 border-primary">
+<p class="font-body-md text-text-secondary">Log details are compliant. No anomalies detected.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</main>
+<script>
+        function toggleDetails(rowId) {
+            const detailRow = document.getElementById(rowId);
+            const expandableContent = detailRow.querySelector('.expandable-row');
+            
+            if (detailRow.classList.contains('hidden')) {
+                // Show
+                detailRow.classList.remove('hidden');
+                // Small delay to allow display:table-row to apply before animating opacity/height
+                setTimeout(() => {
+                    expandableContent.classList.add('expanded');
+                }, 10);
+            } else {
+                // Hide
+                expandableContent.classList.remove('expanded');
+                // Wait for transition to finish before hiding row
+                setTimeout(() => {
+                    detailRow.classList.add('hidden');
+                }, 300); // matches transition duration
+            }
+        }
+    </script>
+</body></html>

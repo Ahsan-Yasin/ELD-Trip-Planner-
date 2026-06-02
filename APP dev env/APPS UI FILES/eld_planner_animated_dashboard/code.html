@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ELD Trip Planner</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Courier+Prime&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            @keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes slideInRight {
+                from {
+                    opacity: 0;
+                    transform: translateX(50px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes pulseSoft {
+                0% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.1); opacity: 0.8; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+
+            @keyframes float {
+                0% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+                100% { transform: translateY(0px); }
+            }
+
+            @keyframes shimmer {
+                0% { background-position: -1000px 0; }
+                100% { background-position: 1000px 0; }
+            }
+
+            .animate-fade-in-up {
+                animation: fadeInUp 0.5s ease-out forwards;
+                opacity: 0;
+            }
+
+            .animate-slide-in-right {
+                animation: slideInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                opacity: 0;
+            }
+
+            .animate-pulse-soft {
+                animation: pulseSoft 2s infinite ease-in-out;
+            }
+
+            .animate-float {
+                animation: float 4s ease-in-out infinite;
+            }
+
+            .animate-shimmer {
+                background: linear-gradient(to right, #f6f7f8 4%, #edeef1 25%, #f6f7f8 36%);
+                background-size: 1000px 100%;
+                animation: shimmer 2s infinite linear forwards;
+            }
+
+            .delay-100 { animation-delay: 100ms; }
+            .delay-200 { animation-delay: 200ms; }
+            .delay-300 { animation-delay: 300ms; }
+            .delay-400 { animation-delay: 400ms; }
+            .delay-500 { animation-delay: 500ms; }
+            .delay-600 { animation-delay: 600ms; }
+            .delay-700 { animation-delay: 700ms; }
+        }
+
+        /* Reduced motion fallback */
+        @media (prefers-reduced-motion: reduce) {
+            .animate-fade-in-up, .animate-slide-in-right {
+                opacity: 1;
+                animation: none;
+            }
+            .animate-pulse-soft, .animate-float, .animate-shimmer {
+                animation: none;
+            }
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#c0c7d6",
+                    "on-tertiary-container": "#ffede6",
+                    "primary": "#004ac6",
+                    "background": "#faf8ff",
+                    "primary-container": "#2563eb",
+                    "surface-container": "#ededf6",
+                    "primary-fixed-dim": "#b4c5ff",
+                    "on-secondary": "#ffffff",
+                    "border-subtle": "#E5E7EB",
+                    "on-background": "#191b22",
+                    "surface-container-high": "#e7e7f0",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e2e2eb",
+                    "on-error": "#ffffff",
+                    "inverse-on-surface": "#f0f0f9",
+                    "tertiary-fixed-dim": "#ffb596",
+                    "surface-container-highest": "#e2e2eb",
+                    "tertiary-container": "#bc4800",
+                    "on-primary-container": "#eeefff",
+                    "on-primary-fixed": "#00174b",
+                    "surface-dim": "#d9d9e2",
+                    "on-error-container": "#93000a",
+                    "outline": "#737686",
+                    "tertiary": "#943700",
+                    "tertiary-fixed": "#ffdbcd",
+                    "error-container": "#ffdad6",
+                    "surface": "#faf8ff",
+                    "on-primary-fixed-variant": "#003ea8",
+                    "on-secondary-fixed": "#151c27",
+                    "on-secondary-fixed-variant": "#404754",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-background": "#FFFFFF",
+                    "on-tertiary-fixed-variant": "#7d2d00",
+                    "on-tertiary-fixed": "#360f00",
+                    "primary-fixed": "#dbe1ff",
+                    "secondary-container": "#dce2f3",
+                    "secondary-fixed": "#dce2f3",
+                    "text-secondary": "#6B7280",
+                    "on-secondary-container": "#5e6572",
+                    "inverse-surface": "#2e3037",
+                    "secondary": "#585f6c",
+                    "surface-container-low": "#f3f3fc",
+                    "surface-bright": "#faf8ff",
+                    "error": "#ba1a1a",
+                    "outline-variant": "#c3c6d7",
+                    "on-surface-variant": "#434655",
+                    "text-primary": "#0F1117",
+                    "inverse-primary": "#b4c5ff",
+                    "on-surface": "#191b22",
+                    "surface-tint": "#0053db"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "md": "16px",
+                    "base": "8px",
+                    "gutter": "16px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "margin-mobile": "16px",
+                    "lg": "24px",
+                    "xxl": "48px",
+                    "margin-desktop": "32px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "mono-label": ["courierPrime"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "headline-sm": ["18px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+                    "mono-label": ["13px", {"lineHeight": "1", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-surface-container-lowest text-text-primary font-body-md h-screen w-full overflow-hidden flex flex-col antialiased">
+<!-- TopNavBar -->
+<nav class="bg-surface-container-lowest border-b border-border-subtle flex justify-between items-center h-[64px] px-xl w-full sticky top-0 z-50 shrink-0">
+<div class="flex items-center gap-xl">
+<div class="font-headline-sm text-headline-sm font-semibold text-primary">
+                LogisticsPro
+            </div>
+<div class="hidden md:flex gap-md">
+<a class="text-secondary hover:text-primary transition-colors duration-300 cursor-pointer active:opacity-70 px-sm py-xs" href="#">Dashboard</a>
+<a class="text-primary border-b-2 border-primary pb-1 hover:text-primary transition-colors duration-300 cursor-pointer active:opacity-70 px-sm py-xs" href="#">Trips</a>
+<a class="text-secondary hover:text-primary transition-colors duration-300 cursor-pointer active:opacity-70 px-sm py-xs" href="#">Compliance</a>
+<a class="text-secondary hover:text-primary transition-colors duration-300 cursor-pointer active:opacity-70 px-sm py-xs" href="#">Fleet</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-secondary hover:text-primary transition-colors duration-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-secondary hover:text-primary transition-colors duration-300">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-border-subtle">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWZrOnL4Sr8D8QzvFcuVGVI1dUjo6Nu2Eg1l9DUIGPuKi9Fli8sOvahlH76-Cy8UHo2qtKnywssurjiEVHfJ1c0XaOmPxpUIBvLJ8tLIQpGiaOQa5bzic71y3uGp8qwwhFajKdims0M-NwOm2Blf2i1ZRI5xSQiTkeL3xnb__4XiezXla8rRlYM8lkqAoqXNumrcaqyfSW6qr-w3Em0uQyxBK-05aW0GK9AEKexQvHcPC_eNmrFlK4C01aaZa2I3ECemuZpUP6Is8"/>
+</div>
+</div>
+</nav>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-low flex flex-col w-[260px] h-full py-lg px-md z-40 border-r border-border-subtle shrink-0">
+<div class="mb-xl px-sm">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">Dispatch Center</h2>
+<p class="font-label-md text-label-md text-secondary mt-xs">Active: 12 Units</p>
+</div>
+<button class="bg-primary-container text-on-primary-container font-label-md text-label-md h-[44px] rounded-lg mb-lg hover:bg-opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-sm">
+                New Trip Request
+            </button>
+<nav class="flex-1 flex flex-col gap-xs">
+<a class="bg-primary-container text-on-primary-container rounded-xl font-semibold flex items-center gap-sm px-md py-sm transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-[20px]">route</span>
+<span class="font-label-md text-label-md">Trip Planner</span>
+</a>
+<a class="text-secondary hover:text-primary hover:bg-surface-container-high rounded-xl flex items-center gap-sm px-md py-sm transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-[20px]">map</span>
+<span class="font-label-md text-label-md">Route Map</span>
+</a>
+<a class="text-secondary hover:text-primary hover:bg-surface-container-high rounded-xl flex items-center gap-sm px-md py-sm transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-[20px]">gavel</span>
+<span class="font-label-md text-label-md">Compliance</span>
+</a>
+<a class="text-secondary hover:text-primary hover:bg-surface-container-high rounded-xl flex items-center gap-sm px-md py-sm transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-[20px]">description</span>
+<span class="font-label-md text-label-md">ELD Logs</span>
+</a>
+<a class="text-secondary hover:text-primary hover:bg-surface-container-high rounded-xl flex items-center gap-sm px-md py-sm transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-[20px]">history</span>
+<span class="font-label-md text-label-md">History</span>
+</a>
+</nav>
+<div class="mt-auto pt-lg border-t border-border-subtle flex flex-col gap-xs">
+<a class="text-secondary hover:text-primary hover:bg-surface-container-high rounded-xl flex items-center gap-sm px-md py-sm transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-[20px]">help</span>
+<span class="font-label-md text-label-md">Support</span>
+</a>
+<a class="text-secondary hover:text-primary hover:bg-surface-container-high rounded-xl flex items-center gap-sm px-md py-sm transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span class="font-label-md text-label-md">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col md:flex-row overflow-hidden bg-surface-container-lowest">
+<!-- Left Column (Form & Compliance) -->
+<div class="w-full md:w-[320px] border-r border-border-subtle flex flex-col shrink-0 h-full overflow-y-auto">
+<!-- Trip Planner Form -->
+<div class="p-lg border-b border-border-subtle">
+<h1 class="font-headline-md text-headline-md mb-lg">Trip Planner</h1>
+<form class="flex flex-col gap-md">
+<div class="flex flex-col animate-fade-in-up delay-100">
+<label class="font-label-md text-label-md text-secondary mb-xs transition-colors duration-300">Current Location</label>
+<input class="border-0 border-b border-border-subtle bg-transparent px-0 py-sm focus:ring-0 focus:border-primary transition-colors duration-300 font-body-md text-body-md" type="text" value="Chicago, IL"/>
+</div>
+<div class="flex flex-col animate-fade-in-up delay-200">
+<label class="font-label-md text-label-md text-secondary mb-xs transition-colors duration-300">Pickup</label>
+<input class="border-0 border-b border-border-subtle bg-transparent px-0 py-sm focus:ring-0 focus:border-primary transition-colors duration-300 font-body-md text-body-md" type="text" value="Detroit, MI"/>
+</div>
+<div class="flex flex-col animate-fade-in-up delay-300">
+<label class="font-label-md text-label-md text-secondary mb-xs transition-colors duration-300">Dropoff</label>
+<input class="border-0 border-b border-border-subtle bg-transparent px-0 py-sm focus:ring-0 focus:border-primary transition-colors duration-300 font-body-md text-body-md" type="text" value="New York, NY"/>
+</div>
+<div class="flex flex-col animate-fade-in-up delay-400">
+<label class="font-label-md text-label-md text-secondary mb-xs transition-colors duration-300">Cycle Hours Used</label>
+<input class="border-0 border-b border-border-subtle bg-transparent px-0 py-sm focus:ring-0 focus:border-primary transition-colors duration-300 font-body-md text-body-md" type="text" value="24.5"/>
+</div>
+<button class="mt-sm bg-primary-container text-on-primary-container h-[44px] rounded-lg font-label-md text-label-md hover:bg-opacity-90 hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 shadow-sm animate-fade-in-up delay-500" type="button">
+                            Calculate Route
+                        </button>
+</form>
+</div>
+<!-- Compliance Section -->
+<div class="p-lg">
+<h3 class="font-headline-sm text-headline-sm mb-md">Compliance Status</h3>
+<div class="flex flex-col gap-sm">
+<div class="border border-border-subtle rounded-lg p-md border-l-2 border-l-[#10B981] bg-surface-container-lowest animate-fade-in-up delay-400">
+<div class="font-headline-md text-headline-md">11.0h</div>
+<div class="font-label-md text-label-md text-secondary">Drive Hours Used</div>
+</div>
+<div class="border border-border-subtle rounded-lg p-md border-l-2 border-l-[#10B981] bg-surface-container-lowest animate-fade-in-up delay-500">
+<div class="font-headline-md text-headline-md">31.5h</div>
+<div class="font-label-md text-label-md text-secondary">Cycle Hours Remaining</div>
+</div>
+<div class="border border-border-subtle rounded-lg p-md border-l-2 border-l-[#10B981] bg-surface-container-lowest animate-fade-in-up delay-600">
+<div class="font-headline-md text-headline-md">2</div>
+<div class="font-label-md text-label-md text-secondary">Days Required</div>
+</div>
+</div>
+<div class="mt-lg pt-md border-t border-border-subtle animate-fade-in-up delay-700">
+<h4 class="font-label-md text-label-md text-secondary mb-sm">Violations</h4>
+<div class="flex items-center gap-sm text-[#10B981]">
+<span class="material-symbols-outlined text-[20px] animate-pulse-soft">check_circle</span>
+<span class="font-body-md text-body-md font-medium">Compliant</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (Map & Logs) -->
+<div class="flex-1 flex flex-col h-full overflow-hidden">
+<!-- Map View -->
+<div class="h-[50%] border-b border-border-subtle relative bg-surface-variant flex items-center justify-center overflow-hidden">
+<img alt="Map View Placeholder" class="absolute inset-0 w-full h-full object-cover opacity-50 grayscale transition-opacity duration-700" data-location="USA Route Map" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqpYQypW9Gd34ShFtMRBP7gbsO_2mTPzBRSP1bByv1aJd2hk7URqL7YBIzgbXzezRjVtlU4hi7CbRVySY1LFI8jyZreYz6UqBT2ydeINMbB70HmqN1rkBDo9Wwn0EByKxY0Z3y8zhBFoa1Za7raymrrcqpFNjc0PdOLPgLT9uFzAbmhe8CIfQt3CkF3ulBvVpniPvDZ99q9HqEO5vbrcWLRLBFthD6Vsel1fP8yIhRVYGJPQ3D4ue-BwjzKaIa0AtWTzzs99oPF80"/>
+<!-- Map Overlay Card -->
+<div class="absolute top-md right-md bg-surface-container-lowest border border-border-subtle rounded-lg p-md shadow-sm min-w-[200px] animate-slide-in-right delay-300">
+<div class="flex flex-col gap-xs">
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-secondary">Total Distance:</span>
+<span class="font-body-md text-body-md font-medium">812.4 mi</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-secondary">Est. Drive Time:</span>
+<span class="font-body-md text-body-md font-medium">14.76h</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-label-md text-label-md text-secondary">Fuel Stops:</span>
+<span class="font-body-md text-body-md font-medium">0</span>
+</div>
+</div>
+</div>
+</div>
+<!-- ELD Log Viewer -->
+<div class="h-[50%] p-lg flex flex-col bg-surface-container-lowest animate-fade-in-up delay-300">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-sm text-headline-sm">Log Sheets</h3>
+<div class="flex gap-sm">
+<button class="h-[44px] px-md border border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors duration-300 bg-transparent">
+                                Download PNG
+                            </button>
+<button class="h-[44px] px-md border border-primary text-primary rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors duration-300 bg-transparent">
+                                Download All
+                            </button>
+</div>
+</div>
+<div class="flex gap-md border-b border-border-subtle mb-md relative">
+<button class="px-md py-sm text-primary font-label-md text-label-md relative">Day 1
+    <span class="absolute bottom-0 left-0 w-full h-[2px] bg-primary transition-transform duration-300 origin-left"></span>
+</button>
+<button class="px-md py-sm text-secondary hover:text-primary transition-colors duration-300 font-label-md text-label-md relative group">Day 2
+    <span class="absolute bottom-0 left-0 w-full h-[2px] bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+</button>
+</div>
+<div class="flex-1 flex items-center justify-center overflow-hidden border border-border-subtle rounded-lg bg-surface-variant/20 p-md relative">
+<!-- Loading Skeleton -->
+<div class="absolute inset-0 bg-surface-container-lowest flex items-center justify-center z-10 animate-[fadeOut_0.5s_ease-out_1.5s_forwards] pointer-events-none">
+<div class="w-[80%] h-[80%] border border-border-subtle rounded-lg bg-surface-variant/50 animate-shimmer relative overflow-hidden">
+<div class="absolute top-4 left-4 w-1/4 h-4 bg-surface-container-high rounded"></div>
+<div class="absolute top-12 left-4 w-1/2 h-4 bg-surface-container-high rounded"></div>
+<div class="absolute top-24 left-4 w-full h-32 bg-surface-container-high rounded"></div>
+</div>
+</div>
+<img alt="ELD Log Grid" class="max-h-full max-w-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqt5MLbt0VneqyDORcMM5YnbpZXjPTIaIIYIHRFFsfP1bt38fzJ86UrmCh6xGJS8nB-Ljt1xnk3IQtb6zxWvI0fdi_M3O7kYri6N89PSPfnT25kk8x9KOhpqZ8n0waORAZ1lZXE1Ba7-mbqNDbkq-VHk3HbY3m7KY3ULmxm84iDemIP8OPp6Mh37_CODaGGtiyLXe9ualTBQJy764ooqxENcBeC2L1fV-fal_-YXhzze1b5Oes8a1d_4sRXWztCjLRxBPl9PFK6_8"/>
+</div>
+<style>
+    @keyframes fadeOut {
+        to { opacity: 0; visibility: hidden; }
+    }
+</style>
+</div>
+</div>
+</main>
+<!-- NavigationDrawer (AI Assistant) -->
+<div class="fixed right-0 top-0 h-full z-[60] flex flex-col shadow-2xl bg-surface-container-lowest border-l border-border-subtle transition-transform duration-300 ease-in-out w-[320px] translate-x-full" id="aiDrawer">
+<div class="p-lg border-b border-border-subtle flex justify-between items-center">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">AI Logistics Assistant</h2>
+<p class="font-body-md text-body-md text-secondary mt-xs">Ask about routes or compliance</p>
+</div>
+<button class="text-secondary hover:text-primary transition-colors duration-300" onclick="document.getElementById('aiDrawer').classList.add('translate-x-full')">
+<span class="material-symbols-outlined hover:rotate-90 transition-transform duration-300">close</span>
+</button>
+</div>
+<div class="flex border-b border-border-subtle">
+<button class="flex-1 py-sm text-primary font-bold border-b-2 border-primary font-label-md text-label-md transition-colors duration-300">
+<span class="material-symbols-outlined align-middle mr-xs text-[18px]">chat_bubble</span>Chat
+                </button>
+<button class="flex-1 py-sm text-secondary hover:bg-surface-container-low font-label-md text-label-md transition-colors duration-300">
+<span class="material-symbols-outlined align-middle mr-xs text-[18px]">insights</span>Insights
+                </button>
+<button class="flex-1 py-sm text-secondary hover:bg-surface-container-low font-label-md text-label-md transition-colors duration-300">
+<span class="material-symbols-outlined align-middle mr-xs text-[18px]">lightbulb</span>Recommendations
+                </button>
+</div>
+<div class="flex-1 p-md overflow-y-auto">
+<div class="text-secondary font-body-md text-body-md text-center mt-xl">How can I help with your route today?</div>
+</div>
+<div class="p-md border-t border-border-subtle">
+<div class="flex items-center border border-border-subtle rounded-lg px-md py-xs bg-surface-container-lowest focus-within:border-primary transition-colors duration-300">
+<input class="flex-1 border-0 bg-transparent focus:ring-0 font-body-md text-body-md px-0 py-sm" placeholder="Type a message..." type="text"/>
+<button class="text-primary ml-sm hover:scale-110 transition-transform duration-300"><span class="material-symbols-outlined">send</span></button>
+</div>
+</div>
+</div>
+<!-- Floating Action Button for AI -->
+<button class="fixed bottom-xl right-xl w-[56px] h-[56px] bg-primary-container text-on-primary-container rounded-full shadow-lg flex items-center justify-center hover:opacity-90 hover:scale-110 hover:-rotate-12 transition-all duration-300 z-50 animate-float" onclick="document.getElementById('aiDrawer').classList.remove('translate-x-full')">
+<span class="material-symbols-outlined text-[24px]">chat</span>
+</button>
+</div>
+</body></html>
