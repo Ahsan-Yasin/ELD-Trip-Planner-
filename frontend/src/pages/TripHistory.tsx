@@ -1,368 +1,324 @@
-import React, { useState } from 'react';
-import { useTripStore } from '../store';
+import React, { useEffect, useState } from 'react';
+import { useTripStore, type TripHistoryItem } from '../store';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Calendar, 
-  Download, 
-  ArrowRight, 
-  CheckCircle, 
+import {
+  CheckCircle,
   AlertTriangle,
-  ExternalLink,
-  ChevronDown,
-  ChevronUp
+  Clock,
+  MapPin,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+  FileText,
 } from 'lucide-react';
 
-interface HistoryTrip {
-  id: string;
-  date: string;
-  tripId: string;
-  origin: string;
-  destination: string;
-  distance: string;
-  status: 'Compliant' | 'Violation';
-  duration?: string;
-  breaks?: number;
-  violationCode?: string;
-  violationDesc?: string;
-  actionRequired?: string;
-}
-
 const TripHistory: React.FC = () => {
-  const { routeData, complianceData, currentLocation, dropoffLocation } = useTripStore();
+  const {
+    tripHistory,
+    historyLoading,
+    historyError,
+    historyPage,
+    historyTotalPages,
+    loadTripHistory,
+    loadTripById,
+  } = useTripStore();
+
   const navigate = useNavigate();
-  
-  const [activeTab, setActiveTab] = useState<'history' | 'active'>('history');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [loadingTripId, setLoadingTripId] = useState<string | null>(null);
 
-  // Pre-populated mockup history list
-  const initialHistory: HistoryTrip[] = [
-    {
-      id: 'trip-1',
-      date: 'Oct 24, 2026',
-      tripId: 'TRP-8821',
-      origin: 'LAX',
-      destination: 'SEA',
-      distance: '1,135 mi',
-      status: 'Compliant',
-      duration: '18h 45m',
-      breaks: 3
-    },
-    {
-      id: 'trip-2',
-      date: 'Oct 21, 2026',
-      tripId: 'TRP-8790',
-      origin: 'DFW',
-      destination: 'ORD',
-      distance: '925 mi',
-      status: 'Violation',
-      violationCode: 'HOS-14H',
-      violationDesc: 'Driver exceeded the 14-hour duty limit by 45 minutes on Oct 22, 2026.',
-      actionRequired: 'Acknowledge violation and review scheduling protocols.'
-    },
-    {
-      id: 'trip-3',
-      date: 'Oct 18, 2026',
-      tripId: 'TRP-8742',
-      origin: 'MIA',
-      destination: 'ATL',
-      distance: '660 mi',
-      status: 'Compliant',
-      duration: '11h 15m',
-      breaks: 1
-    }
-  ];
+  useEffect(() => {
+    loadTripHistory(1);
+  }, []);
 
-  // If a trip has been computed in the planner, prepend it to the list dynamically!
-  const calculatedTrip: HistoryTrip | null = routeData && complianceData ? {
-    id: 'calculated-trip',
-    date: 'Today',
-    tripId: 'TRP-8924',
-    origin: currentLocation.split(',')[0].toUpperCase(),
-    destination: dropoffLocation.split(',')[0].toUpperCase(),
-    distance: `${routeData.distance_mi.toFixed(0)} mi`,
-    status: complianceData.is_compliant ? 'Compliant' : 'Violation',
-    duration: `${routeData.duration_hr.toFixed(1)}h`,
-    breaks: Math.ceil(routeData.distance_mi / 1000) || 1,
-    violationCode: complianceData.is_compliant ? undefined : 'HOS-LIMIT',
-    violationDesc: complianceData.is_compliant ? undefined : complianceData.violations.join(', ')
-  } : null;
-
-  const allTrips = calculatedTrip 
-    ? [calculatedTrip, ...initialHistory]
-    : initialHistory;
-
-  // Filter trips based on search query
-  const filteredTrips = allTrips.filter(trip => {
-    const searchString = `${trip.origin} ${trip.destination} ${trip.tripId}`.toLowerCase();
-    return searchString.includes(searchQuery.toLowerCase());
-  });
-
-  const toggleDetails = (rowId: string) => {
-    setExpandedRow(prev => (prev === rowId ? null : rowId));
+  const handleViewTrip = async (tripId: string) => {
+    setLoadingTripId(tripId);
+    await loadTripById(tripId);
+    setLoadingTripId(null);
+    navigate('/compliance');
   };
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > historyTotalPages) return;
+    loadTripHistory(newPage);
+  };
+
+  const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return 'Unknown date';
+    try {
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const formatDuration = (hours: number) => {
+    if (!hours) return '--';
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  };
+
+  // Summary stats
+  const totalTrips = tripHistory.length;
+  const compliantTrips = tripHistory.filter((t) => t.is_compliant).length;
+  const totalMiles = tripHistory.reduce((sum, t) => sum + (t.total_distance_miles || 0), 0);
 
   return (
     <div className="flex-1 overflow-y-auto bg-background p-md md:p-lg space-y-lg max-w-7xl mx-auto w-full">
-      {/* Page Header */}
-      <header className="mb-xl">
-        <h1 className="font-headline-lg text-headline-lg text-text-primary mb-md">Trip Management</h1>
-        
-        {/* Navigation Tabs */}
-        <div className="flex gap-lg border-b border-border-subtle">
-          <button 
-            onClick={() => setActiveTab('active')}
-            className={`pb-sm font-label-md text-label-md transition-colors ${
-              activeTab === 'active' 
-                ? 'text-primary border-b-2 border-primary font-semibold' 
-                : 'text-text-secondary hover:text-text-primary'
-            }`}
-          >
-            Active Trips
-          </button>
-          <button 
-            onClick={() => setActiveTab('history')}
-            className={`pb-sm font-label-md text-label-md transition-colors ${
-              activeTab === 'history' 
-                ? 'text-primary border-b-2 border-primary font-semibold' 
-                : 'text-text-secondary hover:text-text-primary'
-            }`}
-          >
-            History
-          </button>
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-md pb-md border-b border-border-subtle">
+        <div>
+          <h1 className="font-headline-lg text-headline-lg text-on-surface">Trip History</h1>
+          <p className="font-body-md text-body-md text-text-secondary mt-xs">
+            All past trip plans with HOS compliance records and ELD logs.
+          </p>
         </div>
-      </header>
+        <button
+          onClick={() => loadTripHistory(historyPage)}
+          disabled={historyLoading}
+          className="h-[44px] px-md border border-border-subtle text-secondary bg-transparent rounded-lg font-label-md text-label-md flex items-center gap-sm hover:bg-surface-container-high transition-colors disabled:opacity-50"
+        >
+          <RefreshCw size={16} className={historyLoading ? 'animate-spin' : ''} />
+          Refresh
+        </button>
+      </div>
 
-      {activeTab === 'active' ? (
-        // Active Trips View
-        <div className="space-y-md">
-          {calculatedTrip ? (
-            <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-md flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
-              <div className="flex items-center gap-md">
-                <div className="w-12 h-12 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-primary">
-                  <span className="material-symbols-outlined text-[24px]">local_shipping</span>
+      {/* Summary Stats */}
+      {tripHistory.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
+          {[
+            {
+              label: 'Trips Loaded',
+              value: totalTrips,
+              icon: <FileText size={18} />,
+              color: 'text-primary bg-primary-container/15',
+            },
+            {
+              label: 'Compliant Routes',
+              value: `${compliantTrips} / ${totalTrips}`,
+              icon: <CheckCircle size={18} />,
+              color: 'text-emerald-600 bg-emerald-50',
+            },
+            {
+              label: 'Total Miles Planned',
+              value: `${totalMiles.toLocaleString('en-US', { maximumFractionDigits: 0 })} mi`,
+              icon: <MapPin size={18} />,
+              color: 'text-blue-600 bg-blue-50',
+            },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="bg-surface-container-lowest border border-border-subtle rounded-xl p-md flex items-center gap-md"
+            >
+              <div className={`p-sm rounded-lg ${stat.color}`}>{stat.icon}</div>
+              <div>
+                <div className="font-headline-sm text-xl font-bold text-on-surface">{stat.value}</div>
+                <div className="font-label-md text-xs text-text-secondary">{stat.label}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Error State */}
+      {historyError && (
+        <div className="p-md bg-error-container/15 border border-error-container rounded-xl flex items-start gap-sm">
+          <AlertTriangle size={18} className="text-error shrink-0 mt-[1px]" />
+          <div>
+            <p className="font-label-md text-sm font-semibold text-on-error-container">
+              Could not load trip history
+            </p>
+            <p className="text-xs text-on-error-container/80 mt-xs">{historyError}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {historyLoading && (
+        <div className="flex flex-col gap-md">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-surface-container-lowest border border-border-subtle rounded-xl p-md animate-pulse"
+            >
+              <div className="flex justify-between items-start mb-md">
+                <div className="space-y-sm">
+                  <div className="h-4 bg-surface-container-highest rounded w-48" />
+                  <div className="h-3 bg-surface-container-highest rounded w-32" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-sm">
-                    <h3 className="font-headline-sm text-base text-text-primary">
-                      {currentLocation} → {dropoffLocation}
+                <div className="h-6 bg-surface-container-highest rounded w-20" />
+              </div>
+              <div className="h-3 bg-surface-container-highest rounded w-full mt-sm" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Trip Cards */}
+      {!historyLoading && tripHistory.length > 0 && (
+        <div className="flex flex-col gap-md">
+          {tripHistory.map((trip: TripHistoryItem) => (
+            <div
+              key={trip.trip_id}
+              className="bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden hover:border-primary-container/50 hover:shadow-sm transition-all duration-200"
+            >
+              <div className="p-md">
+                {/* Top row */}
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-md mb-md">
+                  <div className="flex-1">
+                    {/* Route Title */}
+                    <div className="flex items-center gap-sm mb-xs">
+                      <span
+                        className={`px-sm py-[3px] rounded text-[10px] font-bold uppercase tracking-wider ${
+                          trip.is_compliant
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : 'bg-error-container text-on-error-container'
+                        }`}
+                      >
+                        {trip.is_compliant ? '✓ Compliant' : '⚠ Violation'}
+                      </span>
+                      <span className="font-mono text-[10px] text-text-secondary">{trip.trip_id.slice(0, 8)}...</span>
+                    </div>
+
+                    <h3 className="font-headline-sm text-base font-bold text-on-surface">
+                      {trip.current_location}
+                      <span className="text-text-secondary mx-sm">→</span>
+                      {trip.pickup_location}
+                      <span className="text-text-secondary mx-sm">→</span>
+                      {trip.dropoff_location}
                     </h3>
-                    <span className="font-mono text-xs bg-surface-container-high px-xs py-0.5 rounded">
-                      TRP-8924
+
+                    <div className="flex items-center gap-xs mt-xs text-text-secondary">
+                      <Clock size={12} />
+                      <span className="text-xs">{formatDate(trip.created_at)}</span>
+                    </div>
+                  </div>
+
+                  {/* Action button */}
+                  <button
+                    onClick={() => handleViewTrip(trip.trip_id)}
+                    disabled={loadingTripId === trip.trip_id}
+                    className="h-[36px] px-md bg-primary-container text-on-primary-container rounded-lg font-label-md text-xs hover:brightness-105 transition-all flex items-center gap-xs disabled:opacity-60 shrink-0"
+                  >
+                    {loadingTripId === trip.trip_id ? (
+                      <>
+                        <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                        View Details
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Stats Row */}
+                <div className="flex flex-wrap gap-md mt-sm">
+                  <div className="flex items-center gap-xs">
+                    <span className="text-[10px] text-text-secondary uppercase tracking-wider font-semibold">Distance</span>
+                    <span className="font-headline-sm text-sm font-bold text-on-surface">
+                      {trip.total_distance_miles?.toFixed(1) || '--'} mi
                     </span>
                   </div>
-                  <p className="font-body-md text-xs text-text-secondary mt-xs">
-                    Driver: John Doe • Status: On Route
-                  </p>
+                  <div className="w-px h-4 bg-border-subtle" />
+                  <div className="flex items-center gap-xs">
+                    <span className="text-[10px] text-text-secondary uppercase tracking-wider font-semibold">Drive Time</span>
+                    <span className="font-headline-sm text-sm font-bold text-on-surface">
+                      {formatDuration(trip.total_duration_hours)}
+                    </span>
+                  </div>
+                  <div className="w-px h-4 bg-border-subtle" />
+                  <div className="flex items-center gap-xs">
+                    <span className="text-[10px] text-text-secondary uppercase tracking-wider font-semibold">Days</span>
+                    <span className="font-headline-sm text-sm font-bold text-on-surface">
+                      {trip.days_required}
+                    </span>
+                  </div>
+                  {trip.has_eld_logs && (
+                    <>
+                      <div className="w-px h-4 bg-border-subtle" />
+                      <div className="flex items-center gap-xs text-emerald-600">
+                        <FileText size={12} />
+                        <span className="text-xs font-semibold">{trip.eld_log_count} ELD Log{trip.eld_log_count !== 1 ? 's' : ''}</span>
+                      </div>
+                    </>
+                  )}
                 </div>
-              </div>
-              <div className="flex gap-sm w-full md:w-auto">
-                <button 
-                  onClick={() => navigate('/map')}
-                  className="flex-1 md:flex-initial h-[40px] px-md border border-primary text-primary rounded-lg font-label-md text-xs hover:bg-surface-container-low transition-colors"
-                >
-                  Live Tracking
-                </button>
-                <button 
-                  onClick={() => navigate('/compliance')}
-                  className="flex-1 md:flex-initial h-[40px] px-md bg-primary-container text-on-primary-container rounded-lg font-label-md text-xs hover:opacity-90 transition-opacity"
-                >
-                  Compliance Log
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-surface-container-lowest border border-border-subtle rounded-xl p-xl text-center">
-              <p className="font-body-md text-text-secondary">No active dispatch trips found.</p>
-              <button 
-                onClick={() => navigate('/planner')}
-                className="mt-md px-md py-sm bg-primary-container text-on-primary-container rounded-lg font-label-md text-xs hover:scale-102 transition-transform"
-              >
-                Plan a New Trip
-              </button>
-            </div>
-          )}
-        </div>
-      ) : (
-        // Trip History View
-        <div className="space-y-md">
-          {/* Filters Toolbar */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-end justify-between gap-md">
-            <div className="flex flex-col sm:flex-row gap-md flex-1">
-              <div className="relative flex-1 max-w-sm">
-                <label className="block font-label-md text-label-md text-text-secondary mb-xs">Search Routes or IDs</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-2.5 text-text-secondary" size={18} />
-                  <input 
-                    type="text"
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    className="w-full border-0 border-b border-border-subtle bg-transparent pl-10 pb-xs focus:ring-0 focus:border-primary transition-colors text-sm text-text-primary"
-                    placeholder="e.g. LAX or TRP"
-                  />
-                </div>
-              </div>
-              <div className="relative w-48">
-                <label className="block font-label-md text-label-md text-text-secondary mb-xs">Date Range</label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-2.5 text-text-secondary" size={18} />
-                  <input 
-                    type="text"
-                    readOnly
-                    className="w-full border-0 border-b border-border-subtle bg-transparent pl-10 pb-xs focus:ring-0 text-sm text-text-primary cursor-default"
-                    value="June 2026"
-                  />
-                </div>
-              </div>
-            </div>
-            <button 
-              onClick={() => alert('Report exported successfully!')}
-              className="h-[44px] px-lg border border-primary text-primary rounded-lg font-label-md text-xs font-semibold hover:bg-surface-container-low transition-colors flex items-center justify-center gap-xs"
-            >
-              <Download size={16} />
-              Export Report
-            </button>
-          </div>
 
-          {/* Data Table */}
-          <div className="bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden shadow-sm">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-surface-container-low border-b border-border-subtle">
-                  <th className="px-md py-sm font-label-md text-xs text-text-secondary font-semibold w-1/4">Date Completed</th>
-                  <th className="px-md py-sm font-label-md text-xs text-text-secondary font-semibold w-2/4">Route Summary</th>
-                  <th className="px-md py-sm font-label-md text-xs text-text-secondary font-semibold w-1/6">Total Distance</th>
-                  <th className="px-md py-sm font-label-md text-xs text-text-secondary font-semibold w-1/6">Log Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-subtle">
-                {filteredTrips.length > 0 ? (
-                  filteredTrips.map(trip => {
-                    const isExpanded = expandedRow === trip.id;
-                    const isViolation = trip.status === 'Violation';
-
-                    return (
-                      <React.Fragment key={trip.id}>
-                        <tr 
-                          onClick={() => toggleDetails(trip.id)}
-                          className="cursor-pointer hover:bg-surface-container-low/40 transition-colors group"
-                        >
-                          <td className="px-md py-md font-body-md text-sm text-text-primary">{trip.date}</td>
-                          <td className="px-md py-md font-body-md text-sm text-text-primary">
-                            <div className="flex items-center gap-sm">
-                              <span className="font-mono text-xs bg-surface-container-high px-xs py-0.5 rounded">
-                                {trip.tripId}
-                              </span>
-                              <span>{trip.origin}</span>
-                              <ArrowRight size={14} className="text-text-secondary" />
-                              <span>{trip.destination}</span>
-                              {isExpanded ? <ChevronUp size={16} className="text-text-secondary ml-auto" /> : <ChevronDown size={16} className="text-text-secondary ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />}
-                            </div>
-                          </td>
-                          <td className="px-md py-md font-body-md text-sm text-text-secondary">{trip.distance}</td>
-                          <td className="px-md py-md">
-                            <span className={`inline-flex items-center gap-xs px-sm py-[4px] rounded text-xs font-semibold ${
-                              isViolation 
-                                ? 'bg-error-container text-on-error-container' 
-                                : 'bg-emerald-50 text-emerald-700'
-                            }`}>
-                              {isViolation ? <AlertTriangle size={12} /> : <CheckCircle size={12} />}
-                              {trip.status}
-                            </span>
-                          </td>
-                        </tr>
-                        
-                        {/* Expanded details row */}
-                        {isExpanded && (
-                          <tr className="bg-surface-bright">
-                            <td colSpan={4} className="p-0">
-                              <div className={`p-lg border-l-4 transition-all duration-300 ${
-                                isViolation ? 'border-error bg-red-50/10' : 'border-primary bg-blue-50/5'
-                              }`}>
-                                {isViolation ? (
-                                  // Violation breakdown view
-                                  <div className="space-y-md">
-                                    <div className="flex items-start justify-between">
-                                      <h4 className="font-headline-sm text-sm font-bold text-text-primary">HOS Violation Details</h4>
-                                      <span className="bg-error-container text-on-error-container font-mono px-sm py-0.5 rounded text-[11px] font-semibold">
-                                        Code: {trip.violationCode}
-                                      </span>
-                                    </div>
-                                    <div className="bg-surface-container-lowest border border-border-subtle rounded-lg p-md">
-                                      <p className="font-body-md text-xs text-text-primary">
-                                        <strong className="font-semibold text-error">Description: </strong> 
-                                        {trip.violationDesc}
-                                      </p>
-                                      {trip.actionRequired && (
-                                        <p className="font-body-md text-xs text-text-secondary mt-xs">
-                                          <strong>Action Required: </strong> 
-                                          {trip.actionRequired}
-                                        </p>
-                                      )}
-                                    </div>
-                                    <div className="flex gap-sm">
-                                      <button 
-                                        onClick={() => alert('Violation acknowledged.')}
-                                        className="h-[40px] px-md bg-primary-container text-on-primary-container rounded-lg font-label-md text-xs font-semibold hover:opacity-90 transition-opacity"
-                                      >
-                                        Acknowledge
-                                      </button>
-                                      <button 
-                                        onClick={() => navigate('/compliance')}
-                                        className="h-[40px] px-md border border-border-subtle text-text-primary rounded-lg font-label-md text-xs font-semibold hover:bg-surface-container-low transition-colors flex items-center gap-xs"
-                                      >
-                                        View Full ELD Log
-                                        <ExternalLink size={12} />
-                                      </button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  // Compliant breakdown view
-                                  <div className="space-y-md">
-                                    <h4 className="font-headline-sm text-sm font-bold text-text-primary">HOS Logs Summary</h4>
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
-                                      <div className="bg-surface-container-lowest border border-border-subtle rounded-lg p-md">
-                                        <span className="font-label-md text-[10px] text-text-secondary block mb-xs">Driving Time</span>
-                                        <span className="font-headline-md text-base font-bold text-text-primary">{trip.duration}</span>
-                                      </div>
-                                      <div className="bg-surface-container-lowest border border-border-subtle rounded-lg p-md">
-                                        <span className="font-label-md text-[10px] text-text-secondary block mb-xs">Rest Breaks</span>
-                                        <span className="font-headline-md text-base font-bold text-text-primary">{trip.breaks}</span>
-                                      </div>
-                                      <div className="bg-surface-container-lowest border border-border-subtle rounded-lg p-md">
-                                        <span className="font-label-md text-[10px] text-text-secondary block mb-xs">Exceptions</span>
-                                        <span className="font-headline-md text-base font-bold text-emerald-600">0</span>
-                                      </div>
-                                    </div>
-                                    <div className="flex justify-end">
-                                      <button 
-                                        onClick={() => navigate('/compliance')}
-                                        className="text-primary hover:underline font-label-md text-xs font-semibold flex items-center gap-xs"
-                                      >
-                                        View Full ELD Log
-                                        <ExternalLink size={12} />
-                                      </button>
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="px-md py-xl text-center text-text-secondary">
-                      No matching trips found in history.
-                    </td>
-                  </tr>
+                {/* Violations */}
+                {trip.violation_reasons && trip.violation_reasons.length > 0 && (
+                  <div className="mt-md pt-md border-t border-border-subtle">
+                    <div className="flex flex-col gap-xs">
+                      {trip.violation_reasons.slice(0, 2).map((v, i) => (
+                        <div key={i} className="flex items-start gap-xs text-error">
+                          <AlertTriangle size={12} className="shrink-0 mt-[2px]" />
+                          <span className="text-xs">{v}</span>
+                        </div>
+                      ))}
+                      {trip.violation_reasons.length > 2 && (
+                        <span className="text-xs text-text-secondary">
+                          +{trip.violation_reasons.length - 2} more violation(s)
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 )}
-              </tbody>
-            </table>
-          </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!historyLoading && !historyError && tripHistory.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-[80px] text-center">
+          <span className="material-symbols-outlined text-[64px] text-text-secondary opacity-30 mb-md">
+            history
+          </span>
+          <h3 className="font-headline-sm text-headline-sm text-text-secondary mb-sm">
+            No Trip History Yet
+          </h3>
+          <p className="text-xs text-text-secondary max-w-[300px] mb-lg">
+            Plan your first trip using the Trip Planner and your route history will appear here.
+          </p>
+          <a
+            href="/planner"
+            className="h-[44px] px-lg bg-primary-container text-on-primary-container rounded-lg font-label-md text-label-md hover:opacity-90 transition-all flex items-center gap-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            Plan First Trip
+          </a>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {historyTotalPages > 1 && (
+        <div className="flex justify-center items-center gap-md py-md">
+          <button
+            onClick={() => handlePageChange(historyPage - 1)}
+            disabled={historyPage === 1 || historyLoading}
+            className="p-sm text-secondary hover:text-primary disabled:opacity-30 transition-colors"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <span className="font-label-md text-sm text-text-secondary">
+            Page {historyPage} of {historyTotalPages}
+          </span>
+          <button
+            onClick={() => handlePageChange(historyPage + 1)}
+            disabled={historyPage === historyTotalPages || historyLoading}
+            className="p-sm text-secondary hover:text-primary disabled:opacity-30 transition-colors"
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
       )}
     </div>
