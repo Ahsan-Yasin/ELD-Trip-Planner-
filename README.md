@@ -92,14 +92,13 @@ Visit `http://localhost:5173` to sign up and start planning routes!
 ## 📸 Screenshots
 
 ### 1. Route Planning & Map
-*Placeholder: Drop your route planner screenshot here.*
+![alt text](image.png)
 
 ### 2. Visual ELD Logs
-*Placeholder: Drop your compliance grid screenshot here.*
+![alt text](image-1.png)
 
 ### 3. AI Compliance Assistant
-*Placeholder: Drop your chat assistant screenshot here.*
-
+![alt text](image-2.png)
 ---
 
 ## 👨‍💻 Developed By
