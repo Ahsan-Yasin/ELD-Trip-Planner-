@@ -1,35 +1,46 @@
-import openrouteservice
+import googlemaps
+import googlemaps.convert
 import math
+import requests
 from typing import Optional, List
 
 
 class RouteEngine:
     """
-    Uses OpenRouteService (free API key) for:
-    - Geocoding: address string → {lat, lng}
-    - Directions: multi-waypoint route for HGV (heavy goods vehicle)
+    Uses Google Maps APIs for:
+    - Geocoding: address string → {lat, lng, display_name}
+    - Directions: multi-waypoint driving route with real distance/duration
     """
 
     AVG_SPEED_MPH = 55  # conservative average for a loaded truck
+    OSRM_ROUTE_URL = "https://router.project-osrm.org/route/v1/driving/{coords}"
 
     def __init__(self, api_key: str):
-        self.client = openrouteservice.Client(key=api_key)
+        self.api_key = api_key
+        if api_key:
+            self.client = googlemaps.Client(key=api_key)
+        else:
+            self.client = None
 
     def geocode(self, address: str) -> dict:
         """Address → {lat, lng, display_name}"""
+        if not self.client:
+            print(f"[WARN] No Google Maps API key set; using fallback geocode for: {address}")
+            return self._fallback_geocode(address)
+
         try:
-            result = self.client.pelias_search(text=address)
-            if not result or not result.get("features"):
-                raise ValueError(f"Could not geocode address: {address}")
-            feature = result["features"][0]
-            lng, lat = feature["geometry"]["coordinates"]
+            results = self.client.geocode(address)
+            if not results:
+                raise ValueError(f"No geocode results for: {address}")
+            result = results[0]
+            location = result["geometry"]["location"]
             return {
-                "lat": lat,
-                "lng": lng,
-                "display_name": feature["properties"].get("label", address)
+                "lat": location["lat"],
+                "lng": location["lng"],
+                "display_name": result.get("formatted_address", address),
             }
         except Exception as e:
-            print(f"Geocoding error for {address}: {e}")
+            print(f"[WARN] Google geocoding error for '{address}': {e} — using fallback")
             return self._fallback_geocode(address)
 
     def _fallback_geocode(self, address: str) -> dict:
@@ -40,6 +51,18 @@ class RouteEngine:
             "new york": {"lat": 40.7128, "lng": -74.0060, "display_name": "New York, NY"},
             "ny": {"lat": 40.7128, "lng": -74.0060, "display_name": "New York, NY"},
             "detroit": {"lat": 42.3314, "lng": -83.0458, "display_name": "Detroit, MI"},
+            "south bend": {"lat": 41.6764, "lng": -86.2520, "display_name": "South Bend, IN"},
+            "toledo": {"lat": 41.6528, "lng": -83.5379, "display_name": "Toledo, OH"},
+            "cleveland": {"lat": 41.4993, "lng": -81.6944, "display_name": "Cleveland, OH"},
+            "columbus": {"lat": 39.9612, "lng": -82.9988, "display_name": "Columbus, OH"},
+            "indianapolis": {"lat": 39.7684, "lng": -86.1581, "display_name": "Indianapolis, IN"},
+            "fort wayne": {"lat": 41.0793, "lng": -85.1394, "display_name": "Fort Wayne, IN"},
+            "grand rapids": {"lat": 42.9634, "lng": -85.6681, "display_name": "Grand Rapids, MI"},
+            "milwaukee": {"lat": 43.0389, "lng": -87.9065, "display_name": "Milwaukee, WI"},
+            "madison": {"lat": 43.0722, "lng": -89.4008, "display_name": "Madison, WI"},
+            "omaha": {"lat": 41.2565, "lng": -95.9345, "display_name": "Omaha, NE"},
+            "saint paul": {"lat": 44.9537, "lng": -93.0900, "display_name": "Saint Paul, MN"},
+            "st paul": {"lat": 44.9537, "lng": -93.0900, "display_name": "Saint Paul, MN"},
             "los angeles": {"lat": 34.0522, "lng": -118.2437, "display_name": "Los Angeles, CA"},
             "la": {"lat": 34.0522, "lng": -118.2437, "display_name": "Los Angeles, CA"},
             "dallas": {"lat": 32.7767, "lng": -96.7970, "display_name": "Dallas, TX"},
@@ -61,50 +84,136 @@ class RouteEngine:
         for key, coords in city_map.items():
             if key in addr_lower:
                 return coords
+
+        nominatim_result = self._nominatim_geocode(address)
+        if nominatim_result:
+            return nominatim_result
+
         return {"lat": 39.8283, "lng": -98.5795, "display_name": address}  # center of USA
+
+    def _nominatim_geocode(self, address: str) -> Optional[dict]:
+        """Last-resort public geocoding fallback for cities not in city_map."""
+        try:
+            response = requests.get(
+                "https://nominatim.openstreetmap.org/search",
+                params={
+                    "q": address,
+                    "format": "json",
+                    "limit": 1,
+                    "countrycodes": "us",
+                },
+                headers={"User-Agent": "LogisticsPro-ELD-Trip-Planner/1.0"},
+                timeout=8,
+            )
+            response.raise_for_status()
+            results = response.json()
+            if not results:
+                return None
+
+            result = results[0]
+            return {
+                "lat": float(result["lat"]),
+                "lng": float(result["lon"]),
+                "display_name": result.get("display_name", address),
+            }
+        except Exception as e:
+            print(f"[WARN] Nominatim geocoding error for '{address}': {e}")
+            return None
 
     def get_route(self, start: dict, pickup: dict, dropoff: dict) -> dict:
         """
-        Returns full route data.
+        Returns full route data using Google Maps Directions API.
         start, pickup, dropoff: each a dict with {lat, lng}
         """
-        coords = [
-            [start["lng"],   start["lat"]],
-            [pickup["lng"],  pickup["lat"]],
-            [dropoff["lng"], dropoff["lat"]],
-        ]
+        if not self.client:
+            print("[WARN] No Google Maps API key set; using OSRM road-route fallback.")
+            return self._osrm_route_fallback(start, pickup, dropoff)
 
         try:
-            route_data = self.client.directions(
-                coordinates=coords,
-                profile="driving-hgv",
-                format="geojson",
-                units="mi"
+            origin = (start["lat"], start["lng"])
+            destination = (dropoff["lat"], dropoff["lng"])
+            waypoints = [(pickup["lat"], pickup["lng"])]
+
+            directions = self.client.directions(
+                origin=origin,
+                destination=destination,
+                waypoints=waypoints,
+                mode="driving",
+                units="imperial",
             )
 
-            properties = route_data["features"][0]["properties"]
-            geometry = route_data["features"][0]["geometry"]["coordinates"]
+            if not directions:
+                raise ValueError("Google Directions API returned no routes")
 
-            total_distance_miles = properties["summary"]["distance"]
-            total_duration_hours = properties["summary"]["duration"] / 3600.0
+            route = directions[0]
+
+            # Sum distance (meters) and duration (seconds) across all legs
+            total_distance_meters = 0
+            total_duration_seconds = 0
+            for leg in route["legs"]:
+                total_distance_meters += leg["distance"]["value"]
+                total_duration_seconds += leg["duration"]["value"]
+
+            # Convert units
+            total_distance_miles = total_distance_meters / 1609.34
+            total_duration_hours = total_duration_seconds / 3600.0
+
+            # Decode the overview polyline: Google returns [{lat, lng}, ...]
+            encoded_polyline = route["overview_polyline"]["points"]
+            decoded_points = googlemaps.convert.decode_polyline(encoded_polyline)
+            # Convert to [[lng, lat], ...] to match the existing frontend contract
+            route_polyline = [[p["lng"], p["lat"]] for p in decoded_points]
 
             return {
                 "total_distance_miles": total_distance_miles,
                 "total_duration_hours": total_duration_hours,
-                "route_polyline": geometry,  # [[lng, lat], ...]
+                "route_polyline": route_polyline,
+            }
+
+        except Exception as e:
+            print(f"[WARN] Google Directions API error: {e} - using OSRM road-route fallback")
+            return self._osrm_route_fallback(start, pickup, dropoff)
+
+    def _osrm_route_fallback(self, start: dict, pickup: dict, dropoff: dict) -> dict:
+        """Road-route fallback when Google Directions is unavailable."""
+        coords = ";".join(
+            f"{point['lng']},{point['lat']}"
+            for point in (start, pickup, dropoff)
+        )
+
+        try:
+            response = requests.get(
+                self.OSRM_ROUTE_URL.format(coords=coords),
+                params={"overview": "full", "geometries": "geojson"},
+                timeout=20,
+            )
+            response.raise_for_status()
+            data = response.json()
+            if data.get("code") != "Ok" or not data.get("routes"):
+                raise ValueError(data.get("message", "OSRM returned no route"))
+
+            route = data["routes"][0]
+            return {
+                "total_distance_miles": route["distance"] / 1609.34,
+                "total_duration_hours": route["duration"] / 3600.0,
+                "route_polyline": route["geometry"]["coordinates"],
             }
         except Exception as e:
-            print(f"Routing error: {e}")
-            # Generate a mock polyline between the three points
-            return {
-                "total_distance_miles": self._haversine_distance(start, pickup) + self._haversine_distance(pickup, dropoff),
-                "total_duration_hours": (self._haversine_distance(start, pickup) + self._haversine_distance(pickup, dropoff)) / self.AVG_SPEED_MPH,
-                "route_polyline": [
-                    [start["lng"], start["lat"]],
-                    [pickup["lng"], pickup["lat"]],
-                    [dropoff["lng"], dropoff["lat"]],
-                ],
-            }
+            print(f"[WARN] OSRM routing error: {e} - falling back to haversine distances")
+            return self._haversine_fallback(start, pickup, dropoff)
+
+    def _haversine_fallback(self, start: dict, pickup: dict, dropoff: dict) -> dict:
+        """Straight-line distance fallback when API is unavailable."""
+        dist = self._haversine_distance(start, pickup) + self._haversine_distance(pickup, dropoff)
+        return {
+            "total_distance_miles": dist,
+            "total_duration_hours": dist / self.AVG_SPEED_MPH,
+            "route_polyline": [
+                [start["lng"], start["lat"]],
+                [pickup["lng"], pickup["lat"]],
+                [dropoff["lng"], dropoff["lat"]],
+            ],
+        }
 
     def get_fuel_stop_positions(self, polyline: List, num_stops: int) -> List[dict]:
         """
@@ -124,7 +233,7 @@ class RouteEngine:
                 stops.append({
                     "lat": point[1],
                     "lng": point[0],
-                    "label": f"Fuel/Rest Stop {i}"
+                    "label": f"Fuel/Rest Stop {i}",
                 })
 
         return stops

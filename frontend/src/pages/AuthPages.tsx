@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useTripStore } from '../store';
 import { Shield } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const API_BASE = 'http://localhost:8000/api';
 
-export const AuthPage: React.FC = () => {
+type AuthMode = 'login' | 'signup';
+
+export const AuthPage: React.FC<{ mode?: AuthMode }> = ({ mode = 'login' }) => {
   const { setAuth } = useTripStore();
-  const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
+  const isLogin = mode === 'login';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,6 +37,7 @@ export const AuthPage: React.FC = () => {
       }
 
       setAuth(data.token, data.user);
+      navigate('/', { replace: true });
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -110,13 +115,12 @@ export const AuthPage: React.FC = () => {
         <div className="mt-lg text-center border-t border-border-subtle pt-md">
           <p className="text-xs text-text-secondary">
             {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button
-              type="button"
-              onClick={() => { setIsLogin(!isLogin); setError(''); }}
+            <Link
+              to={isLogin ? '/signup' : '/login'}
               className="text-primary font-bold hover:underline ml-xs"
             >
               {isLogin ? 'Sign Up' : 'Log In'}
-            </button>
+            </Link>
           </p>
         </div>
       </div>

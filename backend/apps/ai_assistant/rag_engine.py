@@ -56,12 +56,21 @@ def retrieve_relevant_context(query: str, top_k=3) -> str:
     return context_str
 
 
-def answer_compliance_question(message: str, conversation_history: list = None, trip_context: dict = None) -> str:
+def answer_compliance_question(
+    message: str = None,
+    conversation_history: list = None,
+    trip_context: dict = None,
+    user_message: str = None,
+) -> str:
     """
     1. Retrieves relevant FMCSA chunks from ChromaDB.
     2. Constructs a highly strict system prompt minimizing token usage.
     3. Calls OpenRouter LLM.
     """
+    message = message or user_message
+    if not message:
+        return "Please enter a question so I can help with FMCSA compliance guidance."
+
     if not OPENROUTER_API_KEY:
         return "OpenRouter API Key not configured. Please add OPENROUTER_API_KEY to your .env file."
 
@@ -108,13 +117,15 @@ FMCSA DOCUMENTATION CONTEXT:
                 "Authorization": f"Bearer {OPENROUTER_API_KEY}",
                 "HTTP-Referer": "http://localhost:5173",
                 "X-Title": "LogisticsPro",
+                "Content-Type": "application/json",
             },
             json={
                 "model": "google/gemini-2.5-flash",
                 "messages": messages,
-                "temperature": 0.2, # Low temp for factual answers
-                "max_tokens": 300   # Limit output tokens to ensure brevity
-            }
+                "temperature": 0.2,
+                "max_tokens": 400
+            },
+            timeout=30
         )
         response.raise_for_status()
         data = response.json()

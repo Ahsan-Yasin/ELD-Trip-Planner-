@@ -33,7 +33,7 @@ class CalculateTripView(APIView):
         driver_name = data.get('driver_name', 'John Doe')
 
         # 1. Geocode + Route
-        api_key = os.environ.get('OPENROUTESERVICE_API_KEY', '')
+        api_key = os.environ.get('GOOGLE_MAPS_API_KEY', '')
         route_engine = RouteEngine(api_key=api_key)
 
         start_coords = route_engine.geocode(current_location)
@@ -177,6 +177,7 @@ class TripDetailView(APIView):
         user_id = request.user_id
         try:
             trip = Trip.objects.get(trip_id=trip_id, user_id=user_id)
+            drive_hrs = sum(d.get('total_driving_hours', 0) for d in trip.daily_segments) if trip.daily_segments else 0
             return Response({
                 "trip_id": trip.trip_id,
                 "current_location": trip.current_location,
@@ -197,6 +198,7 @@ class TripDetailView(APIView):
                     "days_required": len(trip.daily_segments) if trip.daily_segments else 0,
                     "remaining_cycle_hours": trip.remaining_drive_hours,
                     "daily_segments": trip.daily_segments,
+                    "drive_hours_used": drive_hrs,
                 },
                 "eld_logs": trip.eld_logs,
                 "created_at": trip.created_at.isoformat() if trip.created_at else None,

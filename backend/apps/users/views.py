@@ -42,22 +42,23 @@ class RegisterView(APIView):
             return Response({"error": "Email and password required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            if User.objects.filter(email=email).first():
+            # Check if user already exists
+            if User.objects(email=email).first():
                 return Response({"error": "Email already registered"}, status=status.HTTP_400_BAD_REQUEST)
 
+            # Hash password and create user
             hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            
             user = User(email=email, password_hash=hashed_pw)
             user.save()
 
-            token = create_token(user.user_id, user.email)
+            token = create_token(str(user.user_id), user.email)
             return Response({
                 "token": token,
-                "user": {"id": user.user_id, "email": user.email}
+                "user": {"id": str(user.user_id), "email": user.email}
             }, status=status.HTTP_201_CREATED)
 
         except Exception as e:
-            logger.error(f"Registration error: {e}")
+            logger.error(f"Registration error: {e}", exc_info=True)
             return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -74,21 +75,23 @@ class LoginView(APIView):
             return Response({"error": "Email and password required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.filter(email=email).first()
+            user = User.objects(email=email).first()
             if not user:
                 return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            if not bcrypt.checkpw(password.encode('utf-8'), user.password_hash.encode('utf-8')):
+            # Verify password
+            stored_hash = user.password_hash if isinstance(user.password_hash, bytes) else user.password_hash.encode('utf-8')
+            if not bcrypt.checkpw(password.encode('utf-8'), stored_hash):
                 return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-            token = create_token(user.user_id, user.email)
+            token = create_token(str(user.user_id), user.email)
             return Response({
                 "token": token,
-                "user": {"id": user.user_id, "email": user.email}
+                "user": {"id": str(user.user_id), "email": user.email}
             }, status=status.HTTP_200_OK)
 
         except Exception as e:
-            logger.error(f"Login error: {e}")
+            logger.error(f"Login error: {e}", exc_info=True)
             return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

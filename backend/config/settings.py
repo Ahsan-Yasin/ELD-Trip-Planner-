@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'apps.eld',
     'apps.routes',
     'apps.ai_assistant',
-    'apps.users',
+    'apps.users.apps.UsersConfig',
 ]
 
 MIDDLEWARE = [
@@ -117,21 +117,18 @@ CSRF_TRUSTED_ORIGINS = [
 # --- Environment Variables ---
 OPENROUTESERVICE_API_KEY = os.environ.get('OPENROUTESERVICE_API_KEY', '')
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', OPENROUTESERVICE_API_KEY)
+GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', '')
 MONGODB_URI = os.environ.get('MONGODB_URI', 'mongodb://localhost:27017/eld_db')
 
 # --- MongoDB (MongoEngine) ---
-import mongoengine
+from .mongodb import ensure_mongo_connection
 
 try:
-    mongoengine.connect(
-        db='eld_db',
-        host=MONGODB_URI,
-        serverSelectionTimeoutMS=3000,  # 3 second timeout so server starts fast
-    )
-    print("[OK] MongoDB connected successfully")
+    ensure_mongo_connection(MONGODB_URI)
+    print("[OK] MongoDB connection registered")
 except Exception as e:
     print(f"[WARN] Could not connect to MongoDB: {e}")
-    print("   App will still run. Trip history requires MongoDB.")
+    print("   Ensure MongoDB is running and MONGODB_URI is correct.")
 
 # --- Logging ---
 LOGGING = {

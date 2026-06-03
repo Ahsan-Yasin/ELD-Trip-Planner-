@@ -142,7 +142,7 @@ const Dashboard: React.FC = () => {
                         <div className="font-headline-sm text-sm font-semibold text-text-primary">
                           {trip.pickup_location.split(',')[0]} → {trip.dropoff_location.split(',')[0]}
                         </div>
-                        <p className="text-xs text-text-secondary">ID: {trip.trip_id}</p>
+                        <p className="text-xs text-text-secondary">{trip.created_at ? new Date(trip.created_at).toLocaleDateString() : 'Recent'}</p>
                       </div>
                       <div className="text-right">
                         <div className="font-headline-sm text-sm font-semibold text-text-primary">{Math.round(trip.total_distance_miles)} mi</div>

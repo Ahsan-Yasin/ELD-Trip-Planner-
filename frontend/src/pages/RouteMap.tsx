@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTripStore } from '../store';
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Fuel, Package, Info, Menu, Navigation } from 'lucide-react';
+import { Fuel, Package, Info, Menu } from 'lucide-react';
 
 // ── Custom map icons ──────────────────────────────────────────────────────────
 const makeIcon = (html: string, size: [number, number]) =>
